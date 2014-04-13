@@ -1,0 +1,10 @@
+# classe humain
+class Humain:
+    def__init__(self):
+        pointage = 0
+        nombreVaisseaux = 0
+        nombreManufactures = 0
+        nombrePlanetesOccupees = 1
+        puissanceAttaque = 0
+        etoileMere = 0 # coordonnees pour identifier l'etoile-mere du joueur initialisee au hasard depuis le debut
+        def __getEtoiles__ # methode pour conquerir d'autres planetes    
