@@ -1,4 +1,4 @@
 Galax
 =====
 
-Projet Galax
+Projet Galax!
