@@ -5,12 +5,16 @@
 
 from GuiGoat import *
 from tkinter import *
+from tkinter import ttk
 
 
 class Color():
     GRAY = "#3C3F41"
     LIGHT_GRAY = "#525556"
     DARK_GRAY = "#2B2B2B"
+    GREEN = "#3AB35B"
+    RED = "#D35F51"
+    BLACK = "#27292A"
 
 
 class Galaxie(Frame):
@@ -95,9 +99,11 @@ class Gui(Tk):
         self.configure(background=Color.GRAY)
         self.framePrincipal = Frame(self)
         self.framePrincipal.pack(fill=BOTH)
-        self.framePrincipal.grid_rowconfigure(0, weight=1)
-        self.framePrincipal.grid_columnconfigure(1, weight=1)
+        self.framePrincipal.grid_rowconfigure(1, weight=1)
 
+        self.framePrincipal.grid_columnconfigure(0, weight=2)
+        self.framePrincipal.grid_columnconfigure(1, weight=1)
+        self.framePrincipal.grid_columnconfigure(2, weight=1)
 
         self.initGalaxie()
         self.initBarreInfo()
@@ -107,70 +113,52 @@ class Gui(Tk):
 
 
     def initBarreInfo(self):
-        self.barreInfo = Frame(self.framePrincipal, width=120, height=self.galaxie.height, relief=SUNKEN,
-                               background=Color.GRAY)
-        self.barreInfo.grid(row=0, column=1, sticky=N+E)
-
-
-    def initBarreCommande(self):
-        self.barreCommande = Frame(self.framePrincipal, height=120, width=self.galaxie.width,
-                                   background=Color.GRAY)
-        self.barreCommande.grid(row=1, column=0)
+        self.barreInfo = Frame(self.framePrincipal, width=150,  relief=SUNKEN,
+                              background=Color.GRAY)
+        self.barreInfo.columnconfigure(1, weight=1)
+        self.barreInfo.grid(row=0, column=0, sticky=N+W+E+S)
 
 
     def initGalaxie(self):
+
         self.galaxie = Galaxie(self.framePrincipal, 25, 20, 32, self)
         self.galaxie["bd"] = 1
-        self.galaxie["background"] = Color.LIGHT_GRAY
+        self.galaxie["background"] = "black"
         self.galaxie.height = 640
         self.galaxie.width = 800
-        self.galaxie.grid(row=0, column=0)
+        self.galaxie.grid(row=0, column=1, sticky=N+E+W+S)
+
+
+
+    def initBarreCommande(self):
+        self.barreCommande = Frame(self.framePrincipal, width=150, height=self.galaxie.height,
+                               background=Color.GRAY)
+        self.barreCommande.grid(row=0, column=2, sticky=N+W+E+S)
+
+
+
 
     def initConsoles(self):
 
-        self.consolesFrame = Frame(self.framePrincipal, width=120, height=self.galaxie.height, background="green")
-        self.consolesFrame.grid(row=0, column=2, sticky=N+E)
+        separateur = Frame(self.framePrincipal, height=20, background=Color.GRAY)
+        separateur.grid(row=1, column=0, columnspan=3, sticky=N+W+E+S)
 
+        self.consolesFrame = Frame(self.framePrincipal, height=self.galaxie.height, relief=SUNKEN, bd=1, background=Color.BLACK)
+        self.consolesFrame.grid(row=2, column=0, columnspan=3, sticky=N+W+E+S)
 
-        self.initConsoleHumains()
-        self.initConsoleEnnemis()
+        self.update_idletasks()
 
+        #Console Humains
+        self.consoleHumains = Console(self.consolesFrame, 65, 10)
+        self.consoleHumains.console.configure(foreground=Color.GREEN)
+        #self.consoleHumains.pack(side=LEFT, fill=X)
+        self.consoleHumains.grid(row=0, column=0)
 
-
-
-    def initConsoleHumains(self):
-        self.consoleHumainsFrame = Frame(self.consolesFrame, width=120, height=self.galaxie.height, background="green")
-
-        self.consoleHumains = Text(self.consoleHumainsFrame, width=25)
-
-        scrollbar=Scrollbar(self.consoleHumainsFrame, orient=VERTICAL, command=self.consoleHumains.yview)
-        scrollbar.pack(side=RIGHT, fill=Y)
-        self.consoleHumains["yscrollcommand"]=scrollbar.set
-        self.consoleHumains.configure(background="#000000")
-        self.consoleHumains.configure(foreground="green")
-
-        self.consoleHumains.pack(side=LEFT, fill=BOTH, expand=YES)
-
-        self.consoleHumainsFrame.pack(side=LEFT)
-
-    def initConsoleEnnemis(self):
-        self.consoleEnnemisFrame = Frame(self.consolesFrame, width=120, height=self.galaxie.height, background="red")
-        self.consoleEnnemisFrame.grid_propagate(False)
-
-        self.consoleEnnemis = Text(self.consoleEnnemisFrame, width=25, height=0)
-        scrollbar=Scrollbar(self.consoleEnnemisFrame, orient=VERTICAL, command=self.consoleEnnemis.yview)
-        scrollbar.pack(side=RIGHT, fill=Y)
-        self.consoleEnnemis["yscrollcommand"]=scrollbar.set
-        self.consoleEnnemis.configure(background="#000000")
-        self.consoleEnnemis.configure(foreground="green")
-
-
-        self.consoleEnnemis.pack(side=LEFT, fill=BOTH, expand=YES)
-
-        self.consoleEnnemisFrame.pack(side=LEFT)
-
-
-
+        #Console Ennemis
+        self.consoleEnnemis = Console(self.consolesFrame, 67, 10)
+        self.consoleEnnemis.console.configure(foreground=Color.RED)
+        #self.consoleEnnemis.pack(side=LEFT, fill=X)
+        self.consoleEnnemis.grid(row=0, column=1, sticky=N+E+S+W)
 
 
     def run(self):
@@ -180,13 +168,58 @@ class Gui(Tk):
         self.listePlanet
         pass
 
-    def raffraichirJeu(self, listePlanetes):
+    def rafraichirJeu(self, listePlanetes):
         self.galaxie.draw(self, listePlanetes)
 
 
 
-    def notifyClick(self):
+
+    def notifyClick(self, event):
         pass
+
+
+
+
+
+
+class Console(Frame):
+    def __init__(self, parent, largeur, hauteur):
+        Frame.__init__(self,parent)
+
+        self.console = Text(self, width=largeur, height=hauteur)
+
+        #Scroll bar
+        scrollbar= ttk.Scrollbar(self, orient=VERTICAL, command=self.console.yview)
+        scrollbar.pack(side=RIGHT, fill=Y)
+
+        self.console["yscrollcommand"]=scrollbar.set
+        self.console.configure(background=Color.DARK_GRAY)
+        self.console.configure(foreground=Color.GREEN)
+        self.console.configure(state=DISABLED)
+
+        self.console.pack(side=LEFT, fill=BOTH, expand=YES)
+
+    def insert(self, message):
+        self.console.config(state=NORMAL)
+        self.console.insert(END, message + "\n" )
+        self.console.config(state=DISABLED)
+
+    def victoirePlanete(self, race, planete):
+        self.insert(race + " à obtenu la planète " + planete)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def main():
