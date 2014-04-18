@@ -113,10 +113,36 @@ class Gui(Tk):
 
 
     def initBarreInfo(self):
+        # Barre de GAUCHE
         self.barreInfo = Frame(self.framePrincipal, width=150,  relief=SUNKEN,
                               background=Color.GRAY)
         self.barreInfo.columnconfigure(1, weight=1)
         self.barreInfo.grid(row=0, column=0, sticky=N+W+E+S)
+
+        # LABELS: INFORMATIONS
+        Label(self.barreInfo, text="Planètes", anchor=W, justify=LEFT, background=Color.GRAY).grid(row=0, column=0)
+
+        Label(self.barreInfo, text="Humains:", anchor=W, justify=LEFT).grid(row=1, column=0)
+        self.labelNbHumains = Label(self.barreInfo, text=0,  anchor=W, justify=LEFT).grid(row=1, column=1)
+
+        Label(self.barreInfo, text="Czin:", anchor=W, justify=LEFT).grid(row=2, column=0)
+        self.labelNbCzin = Label(self.barreInfo, text=0,  anchor=W, justify=LEFT).grid(row=2, column=1)
+
+        Label(self.barreInfo, text="Gubru:").grid(row=3, column=0)
+        self.labelNbGubru = Label(self.barreInfo, text=0,  anchor=W, justify=LEFT).grid(row=3, column=1)
+
+        Label(self.barreInfo, text="Inspection:").grid(row=4, column=0)
+
+        Label(self.barreInfo, text="Capacité manufacturière:").grid(row=5, column=0)
+        self.labelCapManu = Label(self.barreInfo, text=0,  anchor=W, justify=LEFT).grid(row=5, column=1)
+
+        Label(self.barreInfo, text="Nombre de vaisseaux:").grid(row=6, column=0)
+        self.labelNbVaisseaux = Label(self.barreInfo, text=0,  anchor=W, justify=LEFT).grid(row=6, column=1)
+
+        Label(self.barreInfo, text="Année courante:", anchor=W, justify=LEFT).grid(row=7, column=0)
+        self.labelAnnee = Label(self.barreInfo, text=0,  anchor=W, justify=LEFT).grid(row=7, column=1)
+
+
 
 
     def initGalaxie(self):
@@ -130,10 +156,16 @@ class Gui(Tk):
 
 
 
+
+
     def initBarreCommande(self):
-        self.barreCommande = Frame(self.framePrincipal, width=150, height=self.galaxie.height,
-                               background=Color.GRAY)
+        self.barreCommande = Frame(self.framePrincipal, width=150, height=self.galaxie.height, background=Color.GRAY)
         self.barreCommande.grid(row=0, column=2, sticky=N+W+E+S)
+
+
+
+
+
 
 
 
@@ -168,7 +200,7 @@ class Gui(Tk):
         self.listePlanet
         pass
 
-    def rafraichirJeu(self, listePlanetes):
+    def rafraichirJeu(self, anneeCourante, listePlanetes):
         self.galaxie.draw(self, listePlanetes)
 
 
