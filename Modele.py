@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import random
+import Planete
 
 class Modele:
     def __init__(self, parent, tailleX, tailleY, nombrePlanetes):
