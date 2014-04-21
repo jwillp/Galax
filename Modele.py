@@ -21,14 +21,14 @@ class Modele:
         self.planeteMereHumains = None
         self.planeteMereGubrus = None
         self.planeteMereCzins = None
-        self.humain = None
-        self.gubru = None
-        self.czin = None
+        self.humain = Humain()
+        self.gubru = Gubru()
+        self.czin = Czin()
         
         
     def creerPlanetes(self):
         for n in range(0,self.nombrePlanetes):
-            self.listePlanetes.append(Planete(None, None, None)) #TODO ajouter import pour les planetes
+            self.listePlanetes.append(Planete()) 
             
         for n in range(0,self.nombrePlanetes):
             self.listePlanetes[n] = self.positionsPlanetesRandom()
@@ -54,7 +54,7 @@ class Modele:
     def determinerPlaneteMereHumains(self):
         self.planeteMereHumains = random.randrange(self.listePlanetes)
         self.listePlanetes[self.planeteMereHumains].isPlaneteMere = True
-        self.listePlanetes[self.planeteMereHumains].civilisation = "Humains" #TODO remplacer par Races.HUMAIN quand le Enum est fait
+        self.listePlanetes[self.planeteMereHumains].civilisation = Races.HUMAIN
         self.listePlanetes[self.planeteMereHumains].manufactures = 10
         
     def determinerPlaneteMereGubrus(self):
@@ -65,7 +65,7 @@ class Modele:
             self.determinerPlaneteMereGubru()
         else:           
             self.listePlanetes[self.planeteMereGubrus].isPlaneteMere = True
-            self.listePlanetes[self.planeteMereGubrus].civilisation = "Gubrus" #TODO remplacer par Races.GUBRU quand le Enum est fait
+            self.listePlanetes[self.planeteMereGubrus].civilisation = Races.GUBRU
             self.listePlanetes[self.planeteMereGubrus].manufactures = 10
             
     def determinerPlaneteMereCzins(self):
@@ -75,12 +75,12 @@ class Modele:
             self.determinerPlaneteMereCzins()
         else : 
             self.listePlanetes[self.planeteMereCzins].isPlaneteMere = True
-            self.listePlanetes[self.planeteMereCzins].civilisation = "Czins" #TODO remplacer par Races.CZIN quand le Enum est fait
+            self.listePlanetes[self.planeteMereCzins].civilisation = Races.CZIN
             self.listePlanetes[self.planeteMereCzins].manufactures = 10
             
     def determinerPlanetesIndependantes(self):
         for n in range(0, len(self.listePlanetes)):
-            self.listePlanetes[n].civilisation = "Indépendants"  #TODO remplacer par Races.INDEPENDANT quand le Enum est fait
+            self.listePlanetes[n].civilisation = Races.INDEPENDANT
     
     def ajoutFlottes(self, planeteDepart, planeteArrivee, civilisation, nbVaisseaux):
         #prends pour aquis que le constructeur de Flotte est : Flotte(planeteDepart, planeteArrivee, civilisation, nbVaisseaux)
@@ -93,7 +93,7 @@ class Modele:
                 planeteAttaquee = self.trouverPlaneteAttaquee(self.listeFlottes[n])
                 if planeteAttaquee != -1:
                     planeteAttaquee.defense(self.listeFlottes[n])
-                    if self.listeFlottes[n].civilisation == "Gubru" and planeteAttaquee.civilisation == "Gubru":
+                    if self.listeFlottes[n].civilisation == Races.GUBRU and planeteAttaquee.civilisation == Races.GUBRU:
                         self.gubru.retourFlottesConquete(planeteAttaquee) 
                         
                 self.listeFlottesSuprimmees.append(self.listeFlottes[n])
@@ -113,11 +113,6 @@ class Modele:
                     
         self.listeFlottesSuprimmees.clear()
         
-    def creerCivilisations(self):
-        self.humain = Humain()
-        self.gubru = Gubru()
-        self.czin = Czin()
-        
     def tempsDeplacement(self, planeteDepart, planeteArrivee):
         #calcule le temps de deplacement comme si la distance est l'hypothenuse d'un triangle rectangle et arrondit a une decimale
         distanceX = (planeteArrivee.posX - planeteDepart.posX)**2
@@ -127,13 +122,13 @@ class Modele:
     
     
     def updatePlanetesAttaqueesGubru(self):
-        #s'assure que les Gubrus n'envoir pas plusieurs flottes aux memes planetes
+        #s'assure que les Gubrus n'envoir pas plusieurs flottes aux memes planetes ( appelee dans choisirPlanetesAttaqueesGubru de la classe Gubru)
         listePlanetesPlusAttaquees = []
         for i in range(0,len(self.gubru.listePlanetesAttaquees)):
             trouve = False
             for n in range(0, len(self.listeFlottes)):
                 if self.gubru.listePlanetesAttaquees[i] == self.listeFlottes[n].planeteArrivee:
-                    if self.listeFlottes[n].civilisation == "Gubru": #TODO changer pour Races.GUBRU quand l'enum est fait
+                    if self.listeFlottes[n].civilisation == Races.GUBRU:
                         trouve = True
             if trouve == False: 
                 listePlanetesPlusAttaquees.append(self.gubru.listePlanetesAttaquees[i])
@@ -142,7 +137,17 @@ class Modele:
             self.gubru.listePlanetesAttaquees.remove(listePlanetesPlusAttaquees[n])
                     
         listePlanetesPlusAttaquees.clear()
-                
+       
+    def avancerTemps(self):
+        #fait les taches d'une annee complete sans inclure les actions humaines
+        self.gubru.creerFlottes()
+        self.czin.creerFlottes() #TODO : pas mal tout des Czin 
+        for n in range(0,9):
+            self.arriveeFlottes()
+            self.anneeCourante += 0.1
+            
+        for n in range(0, len(self.listePlanetes)):
+            self.listePlanetes[n].nbVaisseaux += self.listePlanetes[n].nbManufactures   
 
         
     
