@@ -12,7 +12,7 @@ try:
     from PIL import ImageTk
 
     BASIC_MODE = False
-except(ImportError, e):
+except(ImportError):
     BASIC_MODE = True
 
 from UserActions import *

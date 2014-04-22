@@ -1,6 +1,7 @@
 # classe Planete
 class Planete:
-    def__init__():
+    def __init__():
+        pass
         #Nom
         #Civilisation # quelle civilisation occupe cette planete (humain, Czins, Gubru ou non-colonisateurs)
         #isPlaneteMere # methode qui definit si cette planete est une planete d'origine des civilisations colonisatrices
