@@ -1,6 +1,6 @@
 # classe flotte
 class Flotte:
-    def__init__(self):
+    def __init__(self):
         self.civilisation    # preciser a quelle civilisation appartient la flotte
         self.positionDepart  # planete d'ou partent les vaisseaux
         self.positionArrivee # planete ou vont les vaisseaux

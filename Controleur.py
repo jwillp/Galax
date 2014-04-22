@@ -1,14 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
+from Modele import Modele
 from Gui import Gui
-from UserActions import *
-
+from UserActions import UserActions
 
 class Controleur():
     def __init__(self):
         #TODO self.modele = Modele() + inititalisation du modèle
-
+        self.modele = Modele(20, 25, 15)
         self.gui = Gui(self.gameLoop)
         #TODO self.gui.rafraichir(self.modele.anneCourante, self.modele.planetes,
         #                    len(self.modele.getPlanetesHumains),
@@ -33,10 +32,8 @@ class Controleur():
 
 
 
-
-
     def gestionSelectionPlanete(self):
-        pass #TODO Gestion Selection Planete
+        pass  # TODO Gestion Selection Planete
         # afficher les informations de la planète sélectionnée selon niveau connaissances
         # Si planete == Humain ==> Si on a pas déjà une flotte dans le modèle ==> faire une nouvelle flotte
 
@@ -45,10 +42,10 @@ class Controleur():
         pass  # Check coordinates (tuples)
 
     def validationDeplacement(self):
-        pass #TODO  validation Deplacement
+        pass  # TODO  validation Deplacement
 
     def finTour(self):
-        pass #TODO Fin d'un tour
+        pass  # TODO Fin d'un tour
 
     def gestionChangementFlotte(self):
         # TODO mettre flotte même nombre que vaisseaux GUI

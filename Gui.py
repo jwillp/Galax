@@ -3,9 +3,16 @@
 #Python 3.x
 
 
+try:
+    from tkinter import *
+    from tkinter import ttk
 
-from tkinter import *
-from tkinter import ttk
+except (ImportError):
+    from Tkinter import *
+    import ttk
+
+
+
 
 try:
     from PIL import Image
@@ -85,7 +92,7 @@ class Galaxie(Frame):
 
     def draw(self, listePlanete):
         self.canvas.delete("planet")
-        for planet in listePlanete:
+        for planet in listePlanete: # TODO afficher les planètes
             x = self.tailleTuile * planete.x + self.tailleTuile
             y = self.tailleTuile * planete.y + self.tailleTuile
             if planet.race == Race.HUMAINS:
@@ -117,7 +124,7 @@ class Gui(Tk):
         self.wm_title("Galax")
         #self.wm_iconbitmap("galax.ico")
 
-        self.selectionPlanete = None  #La planète sélectionnée actuellement
+        self.selectionPlanete = None  # La planète sélectionnée actuellement
 
         self.initialize()
 
@@ -274,12 +281,8 @@ class Gui(Tk):
 
 
     # MÉTHODES POUR LE CONTRÔLEUR
-
-
-
     def run(self):
         self.mainloop()
-
 
     def rafraichir(self, anneeCourante, listePlanetes, nbPlaneteHumains, nbPlaneteGubru, nbPlaneteCzin):
         self.galaxie.draw(self, listePlanetes)
@@ -291,7 +294,7 @@ class Gui(Tk):
 
 
     def inspecterPlanete(self, nom, capacite, nbVaisseaux):
-        self.infoBox.setValue("Nom de la planète:", nom)
+        self.infoBox.setValue("Nom de la planète:", nom) # TODO inspecter planète
 
         if not capacite:
             capacite = "-"
@@ -437,7 +440,7 @@ class Console(Frame):
         self.console.insert(END, message + "\n")
         self.console.config(state=DISABLED)
 
-    def victoirePlanete(self, race, planete):
+    def victoirePlanete(self, race, planete): # TODO planete
         self.insert(race + " à obtenu la planète " + planete)
 
 
