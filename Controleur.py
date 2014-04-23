@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from Modele import Modele
 from Gui import Gui
+from Notification import Affrontement, Annihilation
 from Races import Races
 from UserActions import UserActions
 
@@ -16,9 +17,9 @@ class Controleur():
         nbPlanete = 40
 
         self.initModele(nbCol, nbLignes, nbPlanete)
-        self.initGui(nbCol, nbLignes, nbPlanete)
+        self.initGui()
 
-    def initGui(self, nbCols, nbLignes, nbPlanetes):
+    def initGui(self):
         self.gui = Gui(self.gameLoop)
         self.gui.activerValiderDeplacement(False)
         self.gui.activerBarreAugmentation(False)
@@ -40,7 +41,7 @@ class Controleur():
     def initModele(self, nbCols, nbLignes, nbPlanetes):
         self.modele = Modele(nbCols, nbLignes, nbPlanetes)
         self.modele.creerPlanetes()
-        self.modele.planeteSelectionnee2 = None # TODO effacer cette ligne lorsque le modele sera modifié
+        self.modele.planeteSelectionnee2 = None  # TODO effacer cette ligne lorsque le modele sera modifié
 
     def gameLoop(self, userAction, coordinates=None):
 
@@ -68,14 +69,14 @@ class Controleur():
 
 
         if not planete:
-                if userAction is UserActions.SELECT_PLANETE:
-                    self.modele.planeteSelectionnee = None
-                    self.gui.resetNombreVaisseaux()
-                    self.gui.activerBarreAugmentation(False)
-                    self.gui.activerValiderDeplacement(False)
+            if userAction is UserActions.SELECT_PLANETE:
+                self.modele.planeteSelectionnee = None
+                self.gui.resetNombreVaisseaux()
+                self.gui.activerBarreAugmentation(False)
+                self.gui.activerValiderDeplacement(False)
 
-                else:
-                    self.modele.planeteSelectionnee2 = None
+            else:
+                self.modele.planeteSelectionnee2 = None
         else:
             if userAction is UserActions.SELECT_PLANETE:
                 self.gestionSelection1(planete)
@@ -93,11 +94,6 @@ class Controleur():
         data["selection2"] = self.modele.planeteSelectionnee2
         data["flottes"] = self.modele.listeFlottes
         self.gui.rafraichir(data)
-
-
-
-
-
 
 
     def gestionSelection1(self, planete):
@@ -121,29 +117,24 @@ class Controleur():
         self.rafraichirFlotte()
 
 
-
     def rafraichirFlotte(self):
         depart = self.modele.planeteSelectionnee
         arrivee = self.modele.planeteSelectionnee2
         data = {}
         data["planeteDepart"] = depart
         data["planeteArrivee"] = arrivee
-        if depart and  arrivee:
+        if depart and arrivee:
             data["distance"] = self.modele.tempsDeplacement(depart, arrivee)
         else:
             data["distance"] = None
         self.gui.rafraichirFlotte(data)
 
 
-
-
-
-
-
     def inspecterPlanete(self, planete):
         """ Inspecte une lpanete selon le niveau de connaissance """
         if planete.civilisation == Races.HUMAIN:
-            self.gui.inspecterPlanete(planete.nom, planete.posX, planete.posY, planete.nbManufactures, planete.nbVaisseaux)
+            self.gui.inspecterPlanete(planete.nom, planete.posX, planete.posY, planete.nbManufactures,
+                                      planete.nbVaisseaux)
             return
 
         if planete.nbVisites == 0:
@@ -157,9 +148,6 @@ class Controleur():
 
         if planete.nbVisites == 3:
             self.gui.inspecterPlanete(planete.nom, planete.posX, planete.posY, planete.nbManufactures)
-
-
-
 
 
     def validationDeplacement(self):
@@ -188,16 +176,10 @@ class Controleur():
         self.modele.ajoutFlottes(planeteDepart, planeteArrive, Races.HUMAIN, nbVaisseaux)
 
 
-
-
-
-
-
-
     def finTour(self):
         """ Méthode gérant le cas de la fin d'un tour"""
         self.modele.avancerTemps()
-        pass  # TODO Fin d'un tour
+        # TODO gestion des notifications
 
 
     def gestionChangementFlotte(self):
@@ -207,14 +189,62 @@ class Controleur():
         self.gui.nbVaisseauxWidget.max = self.modele.planeteSelectionnee.nbVaisseaux
 
 
-
-
-        pass
-
-
     def executer(self):
         """ permet de lancer le GUI """
         self.gui.run()
+
+    # NOTIFICATIONS #
+    def gestionNotifications(self):
+        notifications = self.modele.notifications
+        for notif in notifications:
+            if isinstance(notif, Affrontement):
+                self.gestionNotifAffrontement(notif)
+            elif isinstance(notif, Annihilation):
+                self.gestionNotifAnnihilation(notif)
+
+
+
+    def gestionNotifAnnihilation(self, notif):
+        self.gui.consoleHumains.annihilation(notif.annee, notif.race)
+        self.gui.consoleEnnemis.annihilation(notif.annee, notif.race)
+
+
+    def gestionNotifAffrontement(self, notif):
+
+        #Avec
+        isHumainConcernes = False
+        if notif.attaquant is Races.HUMAIN or notif.defenseur is Races.HUMAIN:
+            isHumainConcernes = True
+
+        # il y eu affrontement
+        self.gui.consoleEnnemis.affrontementPlanete(notif.annee, notif.attaquant, notif.defenseur, notif.planete)
+        if isHumainConcernes:
+            self.gui.consoleHumains.affrontementPlanete(notif.annee, notif.attaquant, notif.defenseur, notif.planete)
+
+        if notif.isDefenseReussie:  # Défense réussie
+            self.gui.consoleEnnemis.defensePlanete(notif.annee, notif.defenseur, notif.attaquant, notif.planete)
+            if isHumainConcernes:
+                self.gui.consoleHumains.defensePlanete(notif.annee, notif.defenseur, notif.attaquant, notif.planete)
+        else:  # Défense ratée, perte planète gain pour autre
+            self.gui.consoleEnnemis.pertePlanete(notif.annee, notif.defenseur, notif.attaquant, notif.planete)
+            self.gui.consoleEnnemis.victoirePlanete(notif.annee, notif.attaquant, notif.planete)
+            if isHumainConcernes:
+                self.gui.consoleHumains.pertePlanete(notif.annee, notif.defenseur, notif.attaquant, notif.planete)
+                self.gui.consoleHumains.victoirePlanete(notif.annee, notif.attaquant, notif.planete)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # TODO Selon les cas, désactiver certains boutons du GUI pour empêcher des problèmes #

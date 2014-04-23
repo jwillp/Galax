@@ -16,6 +16,7 @@ class Planete:
 
 
     def seDefendre(self, flotte):
+        # TODO Création notification affrontement
         effetSurprise = False
         attaquants = flotte.nbVaisseaux
         defenseurs = self.nbVaisseaux
@@ -45,6 +46,9 @@ class Planete:
         if flotte.nbVaisseaux > self.nbVaisseaux:
             self.nbVaisseaux = flotte.nbVaisseaux
             self.civilisation = flotte.civilisation
+
+        #TODO modification de affrontement selon issue du combat
+
 
 
 

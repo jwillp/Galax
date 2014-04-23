@@ -507,9 +507,25 @@ class Console(Frame):
         self.console.insert(END, message + "\n")
         self.console.config(state=DISABLED)
 
-    def victoirePlanete(self, race, planete):  # TODO planete
-        self.insert(race + " à obtenu la planète " + planete)
+    def victoirePlanete(self, annee, race, planete):  # TODO planete
+        message = "[Année: %s] Les %s ont obtenu la planète %s" % (annee, race,planete)
+        self.insert(message)
 
+    def affrontemenPlanete(self,annee, attanquant, defenseur, planete):
+        message = "[Année: %s] Les %s ont attaqué les %s sur %s" % (annee, attanquant, defenseur, planete)
+        self.insert(message)
+
+    def defensePlanete(self, annee, defenseur, attaquant, planete):
+        message = "[Année: %s] Les %s ont défendu avec succes %s contre les %s" % (annee, defenseur, planete, attaquant)
+        self.insert(message)
+
+    def pertePlanete(self, annee, defenseur, attaquant, planete):
+        message = "[Année: %s] Les %s ont perdu %s au main des %s" % (annee, defenseur, planete, attaquant)
+        self.insert(message)
+
+    def annihilationRace(self, race):
+        message = "[Année: %s] Les %s ont été annihilé"
+        self.insert(message)
 
 class BarreAugmentation(Frame):
     def __init__(self, parent, max, min=0, step=1):
