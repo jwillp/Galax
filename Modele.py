@@ -21,8 +21,8 @@ class Modele:
         self.planeteMereHumains = None
         self.planeteMereGubrus = None
         self.planeteMereCzins = None
-        self.gubru = Gubru()
-        self.czin = Czin()
+        self.gubru = Gubru(self)
+        self.czin = Czin(self)
         self.planeteSelectionnee = None
         
         
