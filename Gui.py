@@ -1,6 +1,7 @@
 #!/usr/bin/python32
 # -*- coding: utf-8 -*-
 #Python 3.x
+from Races import Races
 
 try:
     from tkinter import *
@@ -41,9 +42,9 @@ class Galaxie(Frame):
         # Images
         self.arrierePlan = ImageTk.PhotoImage(Image.open("img/fond.jpg"))
 
-        self.gubruImage = ImageTk.PhotoImage(Image.open("img/purple.png"))
-        self.czinImage = ImageTk.PhotoImage(Image.open("img/fire.png"))
-        self.humainImage = ImageTk.PhotoImage(Image.open("img/blue.gif"))
+        self.gubruImage = ImageTk.PhotoImage(Image.open("img/fire.png"))
+        self.czinImage = ImageTk.PhotoImage(Image.open("img/purple.png"))
+        self.humainImage = ImageTk.PhotoImage(Image.open("img/blue.png"))
         self.indieImage = ImageTk.PhotoImage(Image.open("img/white.png"))
 
         self.canvasLargeur = nbColonnes * tailleTuile
@@ -57,40 +58,43 @@ class Galaxie(Frame):
         self.canvas.grid(column=0, row=0, sticky=N + S)
 
         #Dessiner la canvas
-
-
-
-
-
-
-        #Écouteur d'événements
-        self.canvas.bind("<Configure>", self.raffraichirArrierePlan)
-        self.canvas.bind("<Button-1>", self.app.notifyPlanetClick)
-
-    def raffraichirArrierePlan(self, event):
         image = Image.open("img/fond.jpg")
         self.arrierePlan = image.resize(( self.canvas.winfo_width(), self.canvas.winfo_height()), Image.ANTIALIAS)
         self.arrierePlan = ImageTk.PhotoImage(image)
         self.canvas.create_image(0, 0, anchor=NW, image=self.arrierePlan)
 
+        #Écouteur d'événements
+        self.canvas.bind("<Button-1>", self.app.notifyPlanetClick)
+
+
 
     def draw(self, listePlanete):
-        self.canvas.delete("planet")
-        print("OK")
+        self.canvas.delete("planete")
+
         for planete in listePlanete:  # TODO afficher les planètes
-            x = self.tailleTuile * planete.x + self.tailleTuile
-            y = self.tailleTuile * planete.y + self.tailleTuile
-            if planet.race == Race.HUMAINS:
-                self.canvas.create_image(x, y, self.humainImage)
-            elif planet.race == Race.GUBRU:
-                self.canvas.create_image(x, y, self.gubruImage)
-            elif planet.race == Race.CZIN:
-                self.canvas.create_image(x, y, self.czinImage)
-            elif planet.race == Race.INDEPENDANT:
-                self.canvas.create_image(x, y, self.indieImage)
+            x = self.tailleTuile * planete.posX
+            y = self.tailleTuile * planete.posY
+
+            if planete.civilisation == Races.HUMAIN:
+                self.canvas.create_image(x, y, anchor=NW, image=self.humainImage, tag="planete")
+
+            elif planete.civilisation == Races.GUBRU:
+                self.canvas.create_image(x, y, anchor=NW, image=self.gubruImage, tag="planete")
+
+            elif planete.civilisation == Races.CZIN:
+                self.canvas.create_image(x, y, anchor=NW, image=self.czinImage, tag="planete")
+
+            elif planete.civilisation == Races.INDEPENDANT:
+                self.canvas.create_image(x, y, anchor=NW, image=self.indieImage, tag="planete")
 
                 # Dessiner les différentes planètes avec leurs nom
                 # self.canvas.create_text()
+
+
+
+
+
+
 
 
 class Gui(Tk):
@@ -161,7 +165,7 @@ class Gui(Tk):
                           anchor=W, justify=LEFT, background=self.infoBox.background)
         labelCzin.image = image
 
-        self.infoBox.insertWidget("Gurbu:", labelCzin, 0)
+        self.infoBox.insertWidget("Gubru:", labelCzin, 0)
 
         self.infoBox.insertSeperator(7)
 
@@ -255,12 +259,17 @@ class Gui(Tk):
 
     def rafraichir(self, anneeCourante, listePlanetes, nbPlaneteHumains, nbPlaneteGubru, nbPlaneteCzin):
         """ rafraichit le panneau des infos des civilisations+la zone de jeu """
-        self.galaxie.draw(self, listePlanetes)
+        self.galaxie.draw(listePlanetes)
+
+        self.infoBox.setValue("Humains:", nbPlaneteHumains)
+        self.infoBox.setValue("Gubru:", nbPlaneteHumains)
+        self.infoBox.setValue("Czin:", nbPlaneteHumains)
 
         #TODO Si planete selectionnée
-        self.infoBox.setValue("Nom de la planète:", self.selectionPlanete.nom)
-        self.infoBox.setValue("Capacité manufacturière:", self.selectionPlanete.capacite)
-        self.infoBox.setValue("Nombre de vaisseaux:", self.selectionPlanete.nbVaisseaux)
+        if self.selectionPlanete:
+            self.infoBox.setValue("Nom de la planète:", self.selectionPlanete.nom)
+            self.infoBox.setValue("Capacité manufacturière:", self.selectionPlanete.capacite)
+            self.infoBox.setValue("Nombre de vaisseaux:", self.selectionPlanete.nbVaisseaux)
         self.infoBox.setValue("Année courante:", anneeCourante)
 
 
@@ -294,7 +303,7 @@ class Gui(Tk):
     def activerFinTour(self, bool):
         """ permet d'activer/desactiver btn fin tour """
         if bool:
-            bool = 'enabled'
+            bool = 'active'
         else:
             bool = 'disabled'
         self.btnTerminerTour.configure(state=bool)
@@ -302,7 +311,7 @@ class Gui(Tk):
     def activerValiderDeplacement(self, bool):
         """ permet d'activer/desactiver btn fin tour """
         if bool:
-            bool = 'enabled'
+            bool = 'active'
         else:
             bool = 'disabled'
         self.btnValiderDeplacement.configure(state=bool)
@@ -485,7 +494,7 @@ class BarreAugmentation(Frame):
     def activer(self, bool):
         """ permet d'activer/desactiver le widget """
         if bool:
-            bool = 'enabled'
+            bool = 'active'
         else:
             bool = 'disabled'
         self.boutonAug.configure(state=bool)

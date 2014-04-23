@@ -28,7 +28,7 @@ class Modele:
         
     def creerPlanetes(self):
         for n in range(0,self.nombrePlanetes):
-            self.listePlanetes.append(Planete()) 
+            self.listePlanetes.append(Planete(None, None, None))
             self.listePos = [None, None]
             
         for n in range(0,self.nombrePlanetes):
@@ -42,7 +42,7 @@ class Modele:
     def positionsPlanetesRandom(self):
         randomPositionX = random.randrange(self.tailleX) 
         randomPositionY = random.randrange(self.tailleY) 
-        randomManufactures = random.randrange(6)
+        randomManufactures = random.randrange(7)
         position = [randomPositionX, randomPositionY]
         
         for n in range(0, len(self.listePos)):
@@ -58,32 +58,35 @@ class Modele:
         
         
     def determinerPlaneteMereHumains(self):
-        self.planeteMereHumains = random.randrange(self.listePlanetes)
+        self.planeteMereHumains = random.randrange(len(self.listePlanetes))
         self.listePlanetes[self.planeteMereHumains].isPlaneteMere = True
         self.listePlanetes[self.planeteMereHumains].civilisation = Races.HUMAIN
-        self.listePlanetes[self.planeteMereHumains].manufactures = 10
+        self.listePlanetes[self.planeteMereHumains].nbManufactures = 10
+        self.listePlanetes[self.planeteMereHumains].nbVaisseaux = 100
         
     def determinerPlaneteMereGubrus(self):
         #trouve une planete qui n'est pas la planete mere humaine
-        self.planeteMereGubrus = random.randrange(self.listePlanetes)
+        self.planeteMereGubrus = random.randrange(len(self.listePlanetes))
         
         if self.planeteMereGubrus == self.planeteMereHumains:
-            self.determinerPlaneteMereGubru()
+            self.determinerPlaneteMereGubrus()
         else:           
             self.listePlanetes[self.planeteMereGubrus].isPlaneteMere = True
             self.listePlanetes[self.planeteMereGubrus].civilisation = Races.GUBRU
-            self.listePlanetes[self.planeteMereGubrus].manufactures = 10
+            self.listePlanetes[self.planeteMereGubrus].nbManufactures = 10
+            self.listePlanetes[self.planeteMereGubrus].nbVaisseaux = 100
             self.gubru.planeteMere = self.planeteMereGubrus
             
     def determinerPlaneteMereCzins(self):
         #trouve une planete qui n'est pas la planete mere humaine ou Gubru
-        self.planeteMereCzins = random.randrange(self.listePlanetes)
+        self.planeteMereCzins = random.randrange(len(self.listePlanetes))
         if self.planeteMereCzins == self.planeteMereHumains or self.planeteMereCzins == self.planeteMereGubrus:
             self.determinerPlaneteMereCzins()
         else : 
             self.listePlanetes[self.planeteMereCzins].isPlaneteMere = True
             self.listePlanetes[self.planeteMereCzins].civilisation = Races.CZIN
-            self.listePlanetes[self.planeteMereCzins].manufactures = 10
+            self.listePlanetes[self.planeteMereCzins].nbManufactures = 10
+            self.listePlanetes[self.planeteMereCzins].nbVaisseaux = 100
             self.czin.planeteMere = self.planeteMereCzins
             
     def determinerPlanetesIndependantes(self):
@@ -185,7 +188,7 @@ class Modele:
     def listePlanetesRace(self, race):
         nombre = 0
         for planete in self.listePlanetes:
-            if planete.race == race:
+            if planete.civilisation == race:
                 nombre +=1
                 
         return nombre
