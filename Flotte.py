@@ -12,11 +12,3 @@ class Flotte:
         self.tempsArrivee = tempsArrivee
 
 
-    def flottePrepar(self, distance, duree):
-        if distance <= 2
-            duree = distance / 2
-        else
-            duree = 1 + ((distance- 2) / 3)
-
-    
-
