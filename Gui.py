@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 #Python 3.x
 
-
 try:
     from tkinter import *
     from tkinter import ttk
@@ -11,21 +10,15 @@ except (ImportError):
     from Tkinter import *
     import ttk
 
-
-
-
-try:
-    from PIL import Image
-    from PIL import ImageTk
-
-    BASIC_MODE = False
-except(ImportError):
-    BASIC_MODE = True
+from PIL import Image
+from PIL import ImageTk
 
 from UserActions import *
 
 
 class Color():
+    def __init__(self):  pass
+
     GRAY = "#3C3F41"
     LIGHT_GRAY = "#525556"
     DARK_GRAY = "#2B2B2B"
@@ -45,21 +38,13 @@ class Galaxie(Frame):
         self.nbLignes = nbLignes
         self.tailleTuile = tailleTuile  # taille d'une case en pixel
 
-
         # Images
-        if (BASIC_MODE):
-            self.arrierePlan = PhotoImage(file="img/fond.gif")
-            self.gubruImage = PhotoImage(file="img/purple.gif")
-            self.czinImage = PhotoImage(file="img/fire.gif")
-            self.humainImage = PhotoImage(file="img/blue.gif")
-            self.indieImage = PhotoImage(file="img/white.gif")
-        else:
-            self.arrierePlan = ImageTk.PhotoImage(Image.open("img/fond.jpg"))
+        self.arrierePlan = ImageTk.PhotoImage(Image.open("img/fond.jpg"))
 
-            self.gubruImage = ImageTk.PhotoImage(Image.open("img/purple.png"))
-            self.czinImage = ImageTk.PhotoImage(Image.open("img/fire.png"))
-            self.humainImage = ImageTk.PhotoImage(Image.open("img/blue.gif"))
-            self.indieImage = ImageTk.PhotoImage(Image.open("img/white.png"))
+        self.gubruImage = ImageTk.PhotoImage(Image.open("img/purple.png"))
+        self.czinImage = ImageTk.PhotoImage(Image.open("img/fire.png"))
+        self.humainImage = ImageTk.PhotoImage(Image.open("img/blue.gif"))
+        self.indieImage = ImageTk.PhotoImage(Image.open("img/white.png"))
 
         self.canvasLargeur = nbColonnes * tailleTuile
         self.canvasHauteur = nbLignes * tailleTuile
@@ -69,7 +54,7 @@ class Galaxie(Frame):
         self.canvas = Canvas(self, width=self.canvasLargeur, height=self.canvasHauteur, background="#000918",
                              highlightthickness=0)
 
-        self.canvas.grid(column=0, row=0, sticky=N+S)
+        self.canvas.grid(column=0, row=0, sticky=N + S)
 
         #Dessiner la canvas
 
@@ -83,16 +68,15 @@ class Galaxie(Frame):
         self.canvas.bind("<Button-1>", self.app.notifyPlanetClick)
 
     def raffraichirArrierePlan(self, event):
-        print(( self.canvas.winfo_width(),self.canvas.winfo_height()))
         image = Image.open("img/fond.jpg")
-        self.arrierePlan = image.resize(( self.canvas.winfo_width(),self.canvas.winfo_height()), Image.ANTIALIAS)
+        self.arrierePlan = image.resize(( self.canvas.winfo_width(), self.canvas.winfo_height()), Image.ANTIALIAS)
         self.arrierePlan = ImageTk.PhotoImage(image)
         self.canvas.create_image(0, 0, anchor=NW, image=self.arrierePlan)
 
 
     def draw(self, listePlanete):
         self.canvas.delete("planet")
-        for planet in listePlanete: # TODO afficher les planètes
+        for planet in listePlanete:  # TODO afficher les planètes
             x = self.tailleTuile * planete.x + self.tailleTuile
             y = self.tailleTuile * planete.y + self.tailleTuile
             if planet.race == Race.HUMAINS:
@@ -103,15 +87,6 @@ class Galaxie(Frame):
                 self.canvas.create_image(x, y, self.czinImage)
             elif planet.race == Race.INDEPENDANT:
                 self.canvas.create_image(x, y, self.indieImage)
-
-
-
-                #for ligne in range(0, self.nbLignes):
-                #for colonne in range(0, self.nbColonnes):
-                # x1 = colonne * self.tailleTuile
-                #y1 = (ligne * self.tailleTuile)
-                #x2 = x1 + self.tailleTuile
-                #y2 = y1 + self.tailleTuile
 
                 # Dessiner les différentes planètes avec leurs nom
                 # self.canvas.create_text()
@@ -173,35 +148,27 @@ class Gui(Tk):
 
         self.infoBox.insertWidget("Humains:", labelHumain, 0)
 
-
-
-
         image = ImageTk.PhotoImage(Image.open("img/Czin.png"))
         labelCzin = Label(self.infoBox, text=":", foreground=self.infoBox.foreground, compound=LEFT, image=image,
-                            anchor=W, justify=LEFT, background=self.infoBox.background)
+                          anchor=W, justify=LEFT, background=self.infoBox.background)
         labelCzin.image = image
 
         self.infoBox.insertWidget("Czin:", labelCzin, 0)
 
-
         image = ImageTk.PhotoImage(Image.open("img/Gubru.png"))
         labelCzin = Label(self.infoBox, text=":", foreground=self.infoBox.foreground, compound=LEFT, image=image,
-                            anchor=W, justify=LEFT, background=self.infoBox.background)
+                          anchor=W, justify=LEFT, background=self.infoBox.background)
         labelCzin.image = image
 
         self.infoBox.insertWidget("Gurbu:", labelCzin, 0)
 
-
-
-
-
-        self.infoBox.insertSeperator(10)
+        self.infoBox.insertSeperator(7)
 
         self.infoBox.insertNewTitle("Inspection")
         self.infoBox.insertLabel("Nom de la planète:", "-")
         self.infoBox.insertLabel("Capacité manufacturière:", "-")
         self.infoBox.insertLabel("Nombre de vaisseaux:", "-")
-        self.infoBox.insertSeperator(10)
+        self.infoBox.insertSeperator(7)
 
         self.infoBox.background = Color.MIDNIGHT_BLUE
         self.infoBox.foreground = "white"
@@ -218,7 +185,7 @@ class Gui(Tk):
         self.galaxie.height = 640
         self.galaxie.width = 800
         self.galaxie.grid_columnconfigure(0, weight=1)
-        self.galaxie.grid(row=0, column=1, sticky=N+E+W+S)
+        self.galaxie.grid(row=0, column=1, sticky=N + E + W + S)
 
 
     def initBarreCommande(self):
@@ -245,13 +212,15 @@ class Gui(Tk):
         self.nbVaisseauxWidget = BarreAugmentation(self.commandBox, 0)
         self.nbVaisseauxWidget.commande = self.notifyFlotteChange
         self.commandBox.insertWidget("nbVaisseaux", self.nbVaisseauxWidget)
-        self.commandBox.insertSeperator(5)
+        self.commandBox.insertSeperator(3)
 
-        self.commandBox.insertWidget("validerDeplacement", Button(self.commandBox, text="Valider le déplacement",
-                                                                  command=self.notifyValiderDeplacement))
-        self.commandBox.insertSeperator(5)
-        self.commandBox.insertWidget("terminerTour",
-                                     Button(self.commandBox, text="Terminer le tour", command=self.notifyTerminerTour))
+        self.btnValiderDeplacement = Button(self.commandBox, text="Valider le déplacement",
+                                            command=self.notifyValiderDeplacement)
+        self.commandBox.insertWidget("validerDeplacement", self.btnValiderDeplacement)
+        self.commandBox.insertSeperator(3)
+
+        self.btnTerminerTour = Button(self.commandBox, text="Terminer le tour", command=self.notifyTerminerTour)
+        self.commandBox.insertWidget("terminerTour", self.btnTerminerTour)
         self.commandBox.grid(row=0, column=0, sticky=N + W + E + S)
         self.commandBox.grid_columnconfigure(0, weight=1)
 
@@ -278,13 +247,13 @@ class Gui(Tk):
         self.consolesFrame.grid_columnconfigure(0, weight=1)
 
 
-
-
     # MÉTHODES POUR LE CONTRÔLEUR
     def run(self):
+        """ Permet de lancer la boucle evenementielle principale du GUI """
         self.mainloop()
 
     def rafraichir(self, anneeCourante, listePlanetes, nbPlaneteHumains, nbPlaneteGubru, nbPlaneteCzin):
+        """ rafraichit le panneau des infos des civilisations+la zone de jeu """
         self.galaxie.draw(self, listePlanetes)
 
         self.infoBox.setValue("Nom de la planète:", self.selectionPlanete.nom)
@@ -293,8 +262,9 @@ class Gui(Tk):
         self.infoBox.setValue("Année courante:", anneeCourante)
 
 
-    def inspecterPlanete(self, nom, capacite, nbVaisseaux):
-        self.infoBox.setValue("Nom de la planète:", nom) # TODO inspecter planète
+    def inspecterPlanete(self, nom, capacite=None, nbVaisseaux=None):
+        """ Permet d'inspecter une planete grace au "panneau planete" (infoBox)"""
+        self.infoBox.setValue("Nom de la planète:", nom)  # TODO inspecter planete
 
         if not capacite:
             capacite = "-"
@@ -304,41 +274,63 @@ class Gui(Tk):
             nbVaisseaux = "-"
             self.nbVaisseauxWidget.min = 0
             self.nbVaisseauxWidget.max = 0
+        # TODO vérification planète humaine ou non
+
         self.infoBox.setValue("Nombre de vaisseaux:", nbVaisseaux)
 
     def rafraichirFlotte(self, flotte):
-        pass # TODO Rafraichir flotte
+        """ Raffraichit le panneau Flotte """
+        pass  # TODO Rafraichir flotte
 
 
     def getNbVaisseaux(self):
+        """ Retourne le nombre de vaisseaux entres par l'utilisateur """
         return self.nbVaisseauxWidget.valeur.get()
 
 
+    # ACTIVATION/DESACTIVATION WIDGET DU GUI #
+    def activerFinTour(self, bool):
+        """ permet d'activer/desactiver btn fin tour """
+        if bool:
+            bool = 'enabled'
+        else:
+            bool = 'disabled'
+        self.btnTerminerTour.configure(state=bool)
+
+    def activerValiderDeplacement(self, bool):
+        """ permet d'activer/desactiver btn fin tour """
+        if bool:
+            bool = 'enabled'
+        else:
+            bool = 'disabled'
+        self.btnValiderDeplacement.configure(state=bool)
+
+    def activerBarreAugmentation(self, bool):
+        """ permet d'activer/desactiver la barre  nb vaisseaux flotte """
+        self.nbVaisseauxWidget.activer(bool)
 
 
 
     # NOTIFICATION D'ENTRÉE UTILISATEUR
 
     def notifyPlanetClick(self, event):
-        x = int(event.x/self.galaxie.tailleTuile)
-        y = int(event.y/self.galaxie.tailleTuile)
-        coord = (x,y)
+        """ lorsque que l'on clique sur l'aire de jeux """
+        x = int(event.x / self.galaxie.tailleTuile)
+        y = int(event.y / self.galaxie.tailleTuile)
+        coord = (x, y)
         self.callBack(UserActions.SELECT_PLANETE, coord)
 
     def notifyValiderDeplacement(self):
+        """ lorsque le bouton valider déplacement est termine """
         self.callBack(UserActions.VALIDER_DEPLACEMENT)
 
     def notifyTerminerTour(self):
+        """ lorsque le bouton terminer tour est presse """
         self.callBack(UserActions.VALIDER_TOUR)
 
     def notifyFlotteChange(self):
-        """ si on augmente ou réduit le nombre de vaisseaux """
+        """ si on augmente ou reduit le nombre de vaisseaux """
         self.callBack(UserActions.FLOTTE_CHANGEMEMT)
-
-
-
-
-
 
 
 ### CUSTOM WIDGETS #####
@@ -440,7 +432,7 @@ class Console(Frame):
         self.console.insert(END, message + "\n")
         self.console.config(state=DISABLED)
 
-    def victoirePlanete(self, race, planete): # TODO planete
+    def victoirePlanete(self, race, planete):  # TODO planete
         self.insert(race + " à obtenu la planète " + planete)
 
 
@@ -457,7 +449,7 @@ class BarreAugmentation(Frame):
         self.min = 0
         self.max = max
 
-        self.commande = None #La commande à appaler en cas d'action event
+        self.commande = None  #La commande à appaler en cas d'action event
 
 
 
@@ -488,6 +480,16 @@ class BarreAugmentation(Frame):
         self.commande()
 
 
+    def activer(self, bool):
+        """ permet d'activer/desactiver le widget """
+        if bool:
+            bool = 'enabled'
+        else:
+            bool = 'disabled'
+        self.boutonAug.configure(state=bool)
+        self.boutonRed.configure(state=bool)
+        self.labelValeur.configure(state=bool)
+
 
 def main():
     gui = Gui(None)
@@ -496,3 +498,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# TODO TESTS
+# TESTER SI L'AFFICHAGE FONCTIONNE
+# TESTER L'ACTIVATION DÉSACTIVATION DES WIDGETS
