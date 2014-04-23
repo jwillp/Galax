@@ -95,7 +95,10 @@ class Modele:
     
     def ajoutFlottes(self, planeteDepart, planeteArrivee, civilisation, nbVaisseaux):
         #prends pour aquis que le constructeur de Flotte est : Flotte(planeteDepart, planeteArrivee, civilisation, nbVaisseaux)
-        self.listeFlottes.append(Flotte(planeteDepart, planeteArrivee, civilisation, nbVaisseaux))
+        self.listeFlottes.append(Flotte(planeteDepart, planeteArrivee, civilisation, nbVaisseaux, self.tempsCourant + self.tempsDeplacement(planeteDepart, planeteArrivee)))
+        for planete in self.listePlanetes:
+            if planete == planeteDepart:
+                planete.nbVaisseaux -= nbVaisseaux
         
     def arriveeFlottes(self):
         #verifie l'arrivee des flottes et gere le retour des flottes Gubrus d'une nouvelle conquete
