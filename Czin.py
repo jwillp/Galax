@@ -11,7 +11,8 @@ class Czin:
         self.valeur_grappe = []
         self.distance_grappe = 4
         self.valeur_base = []
-        self.base = self.parent.planeteMereCzins
+        self.base = None
+        self.planeteMere = None
         
         def initialiserValeurGrappe(self):
             #initialise les valeurs grappe a 0 puis les calcule
@@ -31,7 +32,16 @@ class Czin:
                     self.valeur_base.append(0)
                 else:
                     self.valeur_base.append(self.valeur_grappe[n]-3*self.parent.tempsDeplacement(self.base, self.parent.listePlanetes[n]))
+        
+        def determinerBase(self):
+            valeurMax = 0
+            indexPlanete = None
+            for n in range(0,len(self.valeur_base)):
+                if valeurMax < self.valeur_base[n]:
+                    valeurMax = self.valeur_base[n]
+                    indexPlanete = n  
                     
+            self.base = self.parent.listePlanetes[indexPlanete]
                     
         #TODO : comprendre comment mettre le tout ensemble
                     
