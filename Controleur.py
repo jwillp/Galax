@@ -32,7 +32,7 @@ class Controleur():
         data["selection1"] = None
         data["selection2"] = None
         data["flottesHumaines"] = None
-        data["flottes"] = []
+        data["flottes"] = self.modele.listeFlottes
 
         self.gui.rafraichir(data)
 
@@ -91,7 +91,7 @@ class Controleur():
         data["nbPlanetesCzin"] = self.modele.listePlanetesRace(Races.CZIN)
         data["selection1"] = self.modele.planeteSelectionnee
         data["selection2"] = self.modele.planeteSelectionnee2
-        data["flottes"] = [] # TODO obetenir toute les flottes humaines
+        data["flottes"] = self.modele.listeFlottes
         self.gui.rafraichir(data)
 
 
@@ -175,7 +175,7 @@ class Controleur():
         data["nbPlanetesCzin"] = self.modele.listePlanetesRace(Races.CZIN)
         data["selection1"] = self.modele.planeteSelectionnee = None
         data["selection2"] = self.modele.planeteSelectionnee2 = None
-        data["flottes"] = [] # TODO obetenir toute les flottes humaines
+        data["flottes"] = self.modele.listeFlottes
         self.gui.rafraichir(data)
 
         self.gui.resetNombreVaisseaux()
