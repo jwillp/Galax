@@ -47,6 +47,7 @@ class Galaxie(Frame):
         self.humainImage = ImageTk.PhotoImage(Image.open("img/blue.png"))
         self.indieImage = ImageTk.PhotoImage(Image.open("img/white.png"))
         self.selectionImage = ImageTk.PhotoImage(Image.open("img/selection.png"))
+        self.selectionImage2 = ImageTk.PhotoImage(Image.open("img/selection2.png"))
         self.canvasLargeur = nbColonnes * tailleTuile
         self.canvasHauteur = nbLignes * tailleTuile
 
@@ -71,10 +72,27 @@ class Galaxie(Frame):
     def draw(self, listePlanete, selection1, selection2):
         self.canvas.delete("planete")
 
+        #Affichage des liens entre les sélections
+        if selection1 and selection2:
+            x1 = self.tailleTuile * selection1.posX + self.tailleTuile/2
+            y1 = self.tailleTuile * selection1.posY + self.tailleTuile/2
+
+            x2 = self.tailleTuile * selection2.posX + self.tailleTuile/2
+            y2 = self.tailleTuile * selection2.posY + self.tailleTuile/2
+            self.canvas.create_line(x1, y1, x2, y2, width=4, fill="#AAD106", tag="planete")
+
         for planete in listePlanete:  # TODO afficher les planètes
+
             x = self.tailleTuile * planete.posX
             y = self.tailleTuile * planete.posY
 
+            # SELECTION
+            if planete == selection1:
+                self.canvas.create_image(x-8, y-8, anchor=NW, image=self.selectionImage, tag="planete")
+
+            if planete == selection2:
+                self.canvas.create_image(x-8, y-8, anchor=NW, image=self.selectionImage2, tag="planete")
+            #PLANETE
             if planete.civilisation == Races.HUMAIN:
                 self.canvas.create_image(x, y, anchor=NW, image=self.humainImage, tag="planete")
 
@@ -88,18 +106,9 @@ class Galaxie(Frame):
                 self.canvas.create_image(x, y, anchor=NW, image=self.indieImage, tag="planete")
 
 
-            if planete == selection1:
-                self.canvas.create_image(x, y, anchor=NW, image=self.selectionImage, tag="planete")
 
-            if planete == selection2:
-                self.canvas.create_image(x, y, anchor=NW, image=self.selectionImage, tag="planete")
 
-        if selection1 and selection2:
-            x1 = self.tailleTuile * selection1.posX
-            y1 = self.tailleTuile * selection1.posY
-            x2 = self.tailleTuile * selection2.posX
-            y2 = self.tailleTuile * selection2.posY
-            self.canvas.create_line(x1, y1, x2, y2, width=2, fill="yellow")
+
 
 
 
@@ -301,6 +310,11 @@ class Gui(Tk):
     def getNbVaisseaux(self):
         """ Retourne le nombre de vaisseaux entres par l'utilisateur """
         return self.nbVaisseauxWidget.valeur.get()
+
+    def resetNombreVaisseaux(self):
+        self.nbVaisseauxWidget.valeur.set(0)
+        self.nbVaisseauxWidget.labelValeur.configure(text=self.nbVaisseauxWidget.valeur.get())
+
 
     # ACTIVATION/DESACTIVATION WIDGET DU GUI #
     def activerFinTour(self, bool):

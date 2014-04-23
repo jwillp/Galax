@@ -30,6 +30,7 @@ class Controleur():
     def initModele(self, nbCols, nbLignes, nbPlanetes):
         self.modele = Modele(nbCols, nbLignes, nbPlanetes)
         self.modele.creerPlanetes()
+        self.modele.planeteSelectionnee2 = None # TODO effacer cette ligne lorsque le modele sera modifié
 
     def gameLoop(self, userAction, coordinates=None):
 
@@ -41,36 +42,83 @@ class Controleur():
             self.finTour()
 
         elif userAction is UserActions.SELECT_PLANETE or userAction is UserActions.SELECT_PLANETE_2:
-            self.gestionSelectionPlanete(coordinates)
+            self.gestionSelectionPlanete(coordinates, userAction)
 
         elif userAction == UserActions.FLOTTE_CHANGEMEMT:
             self.gestionChangementFlotte()
 
 
     # MÉTHODES DE CONTRÔLES PRINCIPALES #
-    def gestionSelectionPlanete(self, coordonnee):
+    def gestionSelectionPlanete(self, coordonnee, userAction):
         """ Méthode gérant le cas de la sélection d'une planète """
         planete = self.modele.getPlaneteAt(coordonnee[0], coordonnee[1])
         if not planete:
             return
 
-
         # TODO Gestion Selection Planete
 
-        self.modele.selectionnerPlanete(planete)
-        self.gui.inspecterPlanete(planete.nom, planete.posX, planete.posY, planete.nbManufactures, planete.nbVaisseaux)
+
+
+        if userAction is UserActions.SELECT_PLANETE:
+            self.gestionSelection1(planete)
+        else:
+            self.gestionSelection2(planete)
+
+
 
         self.gui.rafraichir(self.modele.anneeCourante, self.modele.listePlanetes,
                             self.modele.listePlanetesRace(Races.HUMAIN), self.modele.listePlanetesRace(Races.GUBRU),
                             self.modele.listePlanetesRace(Races.CZIN),
                             self.modele.planeteSelectionnee,
-                            self.modele.planeteSelectionnee
+                            self.modele.planeteSelectionnee2
         )
 
 
+
+
+
+
+    def gestionSelection1(self, planete):
+        self.modele.planeteSelectionnee = planete
+        self.inspecterPlanete(planete)
+
         if self.modele.planeteSelectionnee.civilisation == Races.HUMAIN:
-            self.gui.activerBarreAugmentation(True)
-            self.gui.activerValiderDeplacement(True)
+            activation = True
+        else:
+            activation = False
+            self.gui.resetNombreVaisseaux()
+
+        self.gui.activerBarreAugmentation(activation)
+        self.gui.activerValiderDeplacement(activation)
+
+    def gestionSelection2(self, planete):
+        self.modele.planeteSelectionnee2 = planete
+        if self.modele.planeteSelectionnee != self.modele.planeteSelectionnee2:
+            self.inspecterPlanete(planete)
+
+
+
+
+    def inspecterPlanete(self, planete):
+        """ Inspecte une lpanete selon le niveau de connaissance """
+        if planete.civilisation == Races.HUMAIN:
+            self.gui.inspecterPlanete(planete.nom, planete.posX, planete.posY, planete.nbManufactures, planete.nbVaisseaux)
+            return
+
+        if planete.nbVisites == 0:
+            self.gui.inspecterPlanete(planete.nom, planete.posX, planete.posY)
+
+        if planete.nbVisites == 1:
+            self.gui.inspecterPlanete(planete.nom, planete.posX, planete.posY, planete.nbManufactures)
+
+        if planete.nbVisites == 2:
+            self.gui.inspecterPlanete(planete.nom, planete.posX, planete.posY, planete.nbManufactures)
+
+        if planete.nbVisites == 3:
+            self.gui.inspecterPlanete(planete.nom, planete.posX, planete.posY, planete.nbManufactures)
+
+
+
 
 
     def validationDeplacement(self):
@@ -89,7 +137,7 @@ class Controleur():
     def gestionChangementFlotte(self):
         """ Méthode gérant le cas du changement du nombre de vaisseaux d'une flotte """
         # TODO mettre flotte même nombre que vaisseaux GUI
-        #print(self.gui.getNbVaisseaux())
+
         self.gui.nbVaisseauxWidget.max = self.modele.planeteSelectionnee.nbVaisseaux
 
 
