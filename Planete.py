@@ -13,11 +13,10 @@ class Planete:
         self.nbVisites = 0  # nombre de fois que l'humain a visite cette planete
         self.nbVaisseaux = self.nbManufactures  # nombre de vaisseaux que possede la planete
 
-<<<<<<< HEAD
 
     def seDefendre(self, flotte):
         pass
-=======
+
     def attaqueSurprise(self, nbDefenseurs , nbEnvahisseurs):
         r = nbDefenseurs / nbEnvahisseurs
         if r < 5
@@ -27,5 +26,4 @@ class Planete:
             P = (3*r + 35) /100
         else
             P = 0.95
- 
->>>>>>> 50e3a7336c76fde7f04af7f9bfe4990a8f80c5d0
+
