@@ -62,17 +62,25 @@ class Controleur():
     def gestionSelectionPlanete(self, coordonnee, userAction):
         """ Méthode gérant le cas de la sélection d'une planète """
         planete = self.modele.getPlaneteAt(coordonnee[0], coordonnee[1])
-        if not planete:
-            return
+
 
         # TODO Gestion Selection Planete
 
 
+        if not planete:
+                if userAction is UserActions.SELECT_PLANETE:
+                    self.modele.planeteSelectionnee = None
+                    self.gui.resetNombreVaisseaux()
+                    self.gui.activerBarreAugmentation(False)
+                    self.gui.activerValiderDeplacement(False)
 
-        if userAction is UserActions.SELECT_PLANETE:
-            self.gestionSelection1(planete)
+                else:
+                    self.modele.planeteSelectionnee2 = None
         else:
-            self.gestionSelection2(planete)
+            if userAction is UserActions.SELECT_PLANETE:
+                self.gestionSelection1(planete)
+            else:
+                self.gestionSelection2(planete)
 
         # Données de rafraîchissement
         data = {}
