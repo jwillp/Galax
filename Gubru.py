@@ -3,11 +3,11 @@
 from Races import*
 
 class Gubru:
-    def __init__(self,parent):
+    def __init__(self, parent):
         self.parent = parent
         self.force_attaque_basique = 10
         self.nbr_vaisseaux_par_attaque = 5
-        self.planeteMere = parent.modele.planeteMereGubrus
+        self.planeteMere = None
         self.listePlanetesAttaquees = []
         
     def forceAttaque(self):
