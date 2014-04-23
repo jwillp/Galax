@@ -9,3 +9,12 @@ class Flotte:
         self.tempsArrivee    # moment de l'arrivee x.x de l'arrivee sur la planete ciblee
         
     
+    def flottePrepar(self, distance, duree):
+        if distance <= 2
+            duree = distance / 2
+        else
+            duree = 1 + ((distance- 2) / 3)
+
+    
+
+    
