@@ -17,13 +17,14 @@ class Planete:
     def seDefendre(self, flotte):
         pass
 
-    def attaqueSurprise(self, nbDefenseurs , nbEnvahisseurs):
+    @staticmethod
+    def calculEffetSurprise(nbDefenseurs, nbEnvahisseurs):
         r = nbDefenseurs / nbEnvahisseurs
-        if r < 5
-        P = r/10
-        elif
-            r < 20
-            P = (3*r + 35) /100
-        else
-            P = 0.95
+        if r < 5:
+            p = r/10
+        elif r < 20:
+            p = (3*r + 35) / 100
+        else:
+            p = 0.95
 
+        return p
