@@ -2,25 +2,34 @@
 # -*- coding: utf-8 -*-
 from Modele import Modele
 from Gui import Gui
+from Races import Races
 from UserActions import UserActions
+
 
 class Controleur():
     def __init__(self):
-        #TODO self.modele = Modele() + inititalisation du modèle
-        #self.modele = Modele(20, 25, 15)
+        self.modele = None
+        self.gui = None
 
-        # Initialisation du GUI
+        nbCol = 25
+        nbLignes = 20
+        nbPlanete = 25
+
+        self.initModele(nbCol, nbLignes, nbPlanete)
+        self.initGui(nbCol, nbLignes, nbPlanete)
+
+    def initGui(self, nbCols, nbLignes, nbPlanetes):
         self.gui = Gui(self.gameLoop)
         self.gui.activerValiderDeplacement(False)
         self.gui.activerBarreAugmentation(False)
+        self.gui.rafraichir(self.modele.anneeCourante, self.modele.listePlanetes,
+                            self.modele.listePlanetesRace(Races.HUMAIN), self.modele.listePlanetesRace(Races.GUBRU),
+                            self.modele.listePlanetesRace(Races.CZIN))
 
 
-
-        #TODO self.gui.rafraichir(self.modele.anneCourante, self.modele.planetes,
-        #                    len(self.modele.getPlanetesHumains),
-        #                    len(self.modele.getPlanetesGubru),
-        #                    len(self.modele.getPlanetesCzins)
-        #)
+    def initModele(self, nbCols, nbLignes, nbPlanetes):
+        self.modele = Modele(nbCols, nbLignes, nbPlanetes)
+        self.modele.creerPlanetes()
 
     def gameLoop(self, userAction, coordinates=None):
 
@@ -39,31 +48,57 @@ class Controleur():
 
 
     # MÉTHODES DE CONTRÔLES PRINCIPALES #
-    def gestionSelectionPlanete(self):
+    def gestionSelectionPlanete(self, coordonnee):
         """ Méthode gérant le cas de la sélection d'une planète """
-        pass  # TODO Gestion Selection Planete
-        # Si aucune planète ne correspond au coordonnées ==> ne rien faire
-        # Sinon obtenir la planète au coordonées visées
-        # Si on a aucune planète selection dans le modèle alors mettre celle-ci
-        # afficher les informations de la planète sélectionnée selon niveau connaissances
+        planete = self.modele.getPlaneteAt(coordonnee[0], coordonnee[1])
+        if not planete:
+            return
+
+
+
+        # TODO Gestion Selection Planete
+
+        self.gui.inspecterPlanete(planete.nom, planete.nbManufactures, planete.nbVaisseaux)
+
+
+
+
+
+        if not self.modele.planeteSelectionnee:
+            self.modele.selectionnerPlanete(planete)
+
+
+
+        if self.modele.planeteSelectionnee.civilisation == Races.HUMAIN:
+            self.gui.activerBarreAugmentation(True)
+            self.gui.activerValiderDeplacement(True)
+
         # Si planete == Humain ==> Si on a pas déjà une flotte dans le modèle ==> faire une nouvelle flotte
 
-        #self.gui.getNbVaisseaux()
-        #self.gui.inspecterPlanete(planete.nom, planete.capacite, nbVaisseaux)
-        pass  # Check coordinates (tuples)
+         # Check coordinates (tuples)
 
     def validationDeplacement(self):
         """ Méthode gérant le cas de la validation d'un déplacement """
         pass  # TODO  validation Deplacement
 
+
+
+
     def finTour(self):
         """ Méthode gérant le cas de la fin d'un tour"""
+        self.modele.avancerTemps()
         pass  # TODO Fin d'un tour
+
 
     def gestionChangementFlotte(self):
         """ Méthode gérant le cas du changement du nombre de vaisseaux d'une flotte """
         # TODO mettre flotte même nombre que vaisseaux GUI
         #print(self.gui.getNbVaisseaux())
+        self.gui.nbVaisseauxWidget.max = self.modele.planeteSelectionnee.nbVaisseaux
+
+
+
+
         pass
 
 
