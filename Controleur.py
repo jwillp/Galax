@@ -2,25 +2,29 @@
 # -*- coding: utf-8 -*-
 from Modele import Modele
 from Gui import Gui
+from Races import Races
 from UserActions import UserActions
+
 
 class Controleur():
     def __init__(self):
-        #TODO self.modele = Modele() + inititalisation du modèle
-        #self.modele = Modele(20, 25, 15)
+        self.modele = None
+        self.gui = None
+        self.initModele()
+        self.initGui()
 
-        # Initialisation du GUI
+    def initGui(self):
         self.gui = Gui(self.gameLoop)
         self.gui.activerValiderDeplacement(False)
         self.gui.activerBarreAugmentation(False)
+        self.gui.rafraichir(self.modele.anneeCourante, self.modele.listePlanetes,
+                            self.modele.listePlanetesRace(Races.HUMAIN), self.modele.listePlanetesRace(Races.GUBRU),
+                            self.modele.listePlanetesRace(Races.CZIN))
+        self.gui.rafraichir()
 
-
-
-        #TODO self.gui.rafraichir(self.modele.anneCourante, self.modele.planetes,
-        #                    len(self.modele.getPlanetesHumains),
-        #                    len(self.modele.getPlanetesGubru),
-        #                    len(self.modele.getPlanetesCzins)
-        #)
+    def initModele(self):
+        self.modele = Modele(20, 25, 15)
+        self.modele.creerPlanetes()
 
     def gameLoop(self, userAction, coordinates=None):
 

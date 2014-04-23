@@ -4,7 +4,6 @@ import random
 import math
 from Planete import *
 from Flotte import *
-from Humain import *
 from Gubru import *
 from Czin import *
 from Races import *

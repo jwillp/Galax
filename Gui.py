@@ -76,7 +76,8 @@ class Galaxie(Frame):
 
     def draw(self, listePlanete):
         self.canvas.delete("planet")
-        for planet in listePlanete:  # TODO afficher les planètes
+        print("OK")
+        for planete in listePlanete:  # TODO afficher les planètes
             x = self.tailleTuile * planete.x + self.tailleTuile
             y = self.tailleTuile * planete.y + self.tailleTuile
             if planet.race == Race.HUMAINS:
@@ -256,6 +257,7 @@ class Gui(Tk):
         """ rafraichit le panneau des infos des civilisations+la zone de jeu """
         self.galaxie.draw(self, listePlanetes)
 
+        #TODO Si planete selectionnée
         self.infoBox.setValue("Nom de la planète:", self.selectionPlanete.nom)
         self.infoBox.setValue("Capacité manufacturière:", self.selectionPlanete.capacite)
         self.infoBox.setValue("Nombre de vaisseaux:", self.selectionPlanete.nbVaisseaux)
