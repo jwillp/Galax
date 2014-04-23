@@ -18,6 +18,7 @@ class Modele:
         self.listeFlottes = []
         self.anneeCourante = 0
         self.listeFlottesSuprimmees = []
+        self.listePos = []
         self.planeteMereHumains = None
         self.planeteMereGubrus = None
         self.planeteMereCzins = None
@@ -29,25 +30,31 @@ class Modele:
     def creerPlanetes(self):
         for n in range(0,self.nombrePlanetes):
             self.listePlanetes.append(Planete()) 
+            self.listePos = [None, None]
             
         for n in range(0,self.nombrePlanetes):
             self.listePlanetes[n] = self.positionsPlanetesRandom()
-        
-    def positionsPlanetesRandom(self):
-        randomPositionX = random.randrange(self.tailleX) #TODO trouver la variable pour la taille en X du jeu
-        randomPositionY = random.randrange(self.tailleY) #TODO trouver la variable pour la taille en Y du jeu
-        randomManufactures = random.randrange(6)
-        
-        for n in range(0,len(self.listePlanetes)):
-            while self.listePlanetes[n].posX == randomPositionX and self.listePlanetes[n].posY == randomPositionY:
-                randomPositionX = random.randrange(self.tailleX)
-                randomPositionY = random.randrange(self.tailleY)
-            return Planete(randomPositionX, randomPositionY, randomManufactures) #TODO ajouter import pour les planetes
-        
+            
         self.determinerPlanetesIndependantes()
         self.determinerPlaneteMereHumains()
         self.determinerPlaneteMereGubrus()
         self.determinerPlaneteMereCzins()
+        
+    def positionsPlanetesRandom(self):
+        randomPositionX = random.randrange(self.tailleX) 
+        randomPositionY = random.randrange(self.tailleY) 
+        randomManufactures = random.randrange(6)
+        position = [randomPositionX, randomPositionY]
+        
+        for n in range(0, len(self.listePos)):
+            while self.listePos[n] in position:
+                randomPositionX = random.randrange(self.tailleX) 
+                randomPositionY = random.randrange(self.tailleY) 
+                position = [randomPositionX, randomPositionY]
+                
+        return Planete(randomPositionX, randomPositionY, randomManufactures) #TODO ajouter import pour les planetes
+        
+        
         
         
         
@@ -149,7 +156,38 @@ class Modele:
         for n in range(0, len(self.listePlanetes)):
             self.listePlanetes[n].nbVaisseaux += self.listePlanetes[n].nbManufactures   
 
+    def isHumainVivant(self):
+        resteFlottes = False
+        restePlanetes = False
         
+        for planete in self.listePlanetes:
+            if planete.civilisation == Races.HUMAIN:
+                restePlanetes = True
+                
+        for flotte in self.listeFlottes:
+            if flotte.civilisation == Races.HUMAIN:
+                resteFlottes = True
+                
+        if resteFlottes and restePlanetes:
+            return True
+        else:
+            return False
+        
+    def getPlaneteAt(self, posX, posY):
+        planeteRetour = None
+        for planete in self.listePlanetes:
+            if planete.posX == posX and planete.posY == posY:
+                planeteRetour = planete
+                
+        return planeteRetour
+    
+    def listePlanetesRace(self, race):
+        nombre = 0
+        for planete in self.listePlanetes:
+            if planete.race == race:
+                nombre +=1
+                
+        return nombre
     
     
         
