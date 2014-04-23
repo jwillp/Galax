@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import math
 
 
 class Planete:
@@ -15,7 +16,37 @@ class Planete:
 
 
     def seDefendre(self, flotte):
-        pass
+        effetSurprise = False
+        attaquants = flotte.nbVaisseaux
+        defenseurs = self.nbVaisseaux
+
+        probSurprise = self.calculEffetSurprise()*100
+        rnd = math.randint(0, 100)
+        if 0 <= rnd < probSurprise:
+            effetSurprise = True
+            attaquants, defenseur = defenseurs, attaquants
+
+        indexAttanquant = attaquants
+        indexDefenseur = defenseurs
+
+        while attaquants != 0 and defenseurs != 0:
+            rand = math.randint(0, 10)
+            if 0 <= rand <= 7:  # Victoire du defenseur
+                indexAttanquant -= 1
+            else:  # Victoire de l'attaquant
+                indexDefenseur -= 1
+
+        if effetSurprise:
+            attaquants, defenseur = defenseurs, attaquants
+
+        self.nbVaisseaux = defenseurs
+        flotte.nbVaisseaux = attaquants
+
+        if flotte.nbVaisseaux > self.nbVaisseaux:
+            self.nbVaisseaux = flotte.nbVaisseaux
+            self.civilisation = flotte.civilisation
+
+
 
     @staticmethod
     def calculEffetSurprise(nbDefenseurs, nbEnvahisseurs):
@@ -28,3 +59,4 @@ class Planete:
             p = 0.95
 
         return p
+
