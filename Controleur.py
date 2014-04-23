@@ -13,7 +13,7 @@ class Controleur():
 
         nbCol = 25
         nbLignes = 20
-        nbPlanete = 25
+        nbPlanete = 40
 
         self.initModele(nbCol, nbLignes, nbPlanete)
         self.initGui(nbCol, nbLignes, nbPlanete)
@@ -40,7 +40,7 @@ class Controleur():
         elif userAction == UserActions.VALIDER_TOUR:
             self.finTour()
 
-        elif userAction == UserActions.SELECT_PLANETE:
+        elif userAction is UserActions.SELECT_PLANETE or userAction is UserActions.SELECT_PLANETE_2:
             self.gestionSelectionPlanete(coordinates)
 
         elif userAction == UserActions.FLOTTE_CHANGEMEMT:
@@ -55,18 +55,15 @@ class Controleur():
             return
 
 
-
         # TODO Gestion Selection Planete
 
-        self.gui.inspecterPlanete(planete.nom, planete.nbManufactures, planete.nbVaisseaux)
 
-
-
-
-
-        if not self.modele.planeteSelectionnee:
-            self.modele.selectionnerPlanete(planete)
-
+        self.modele.selectionnerPlanete(planete)
+        self.gui.inspecterPlanete(planete.nom, planete.posX, planete.posY, planete.nbManufactures, planete.nbVaisseaux)
+        self.gui.selectionPlanete = planete
+        self.gui.rafraichir(self.modele.anneeCourante, self.modele.listePlanetes,
+                            self.modele.listePlanetesRace(Races.HUMAIN), self.modele.listePlanetesRace(Races.GUBRU),
+                            self.modele.listePlanetesRace(Races.CZIN))
 
 
         if self.modele.planeteSelectionnee.civilisation == Races.HUMAIN:

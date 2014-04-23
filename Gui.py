@@ -3,12 +3,12 @@
 #Python 3.x
 from Races import Races
 
-try:
+try: #3.x
     from tkinter import *
     from tkinter import ttk
 
 except (ImportError):
-    from Tkinter import *
+    from Tkinter import * #2.x
     import ttk
 
 from PIL import Image
@@ -46,7 +46,7 @@ class Galaxie(Frame):
         self.czinImage = ImageTk.PhotoImage(Image.open("img/purple.png"))
         self.humainImage = ImageTk.PhotoImage(Image.open("img/blue.png"))
         self.indieImage = ImageTk.PhotoImage(Image.open("img/white.png"))
-
+        self.selectionImage = ImageTk.PhotoImage(Image.open("img/selection.png"))
         self.canvasLargeur = nbColonnes * tailleTuile
         self.canvasHauteur = nbLignes * tailleTuile
 
@@ -87,8 +87,11 @@ class Galaxie(Frame):
             elif planete.civilisation == Races.INDEPENDANT:
                 self.canvas.create_image(x, y, anchor=NW, image=self.indieImage, tag="planete")
 
-                # Dessiner les différentes planètes avec leurs nom
-                # self.canvas.create_text()
+            print(self.app.selectionPlanete)
+            if planete == self.app.selectionPlanete:
+                self.canvas.create_image(x, y, anchor=NW, image=self.selectionImage, tag="planete")
+
+
 
 
 
@@ -265,15 +268,10 @@ class Gui(Tk):
         self.infoBox.setValue("Gubru:", nbPlaneteHumains)
         self.infoBox.setValue("Czin:", nbPlaneteHumains)
 
-        #TODO Si planete selectionnée
-        if self.selectionPlanete:
-            self.infoBox.setValue("Nom de la planète:", self.selectionPlanete.nom)
-            self.infoBox.setValue("Capacité manufacturière:", self.selectionPlanete.capacite)
-            self.infoBox.setValue("Nombre de vaisseaux:", self.selectionPlanete.nbVaisseaux)
         self.infoBox.setValue("Année courante:", anneeCourante)
 
 
-    def inspecterPlanete(self, nom, capacite=None, nbVaisseaux=None):
+    def inspecterPlanete(self, nom, x, y, capacite=None, nbVaisseaux=None):
         """ Permet d'inspecter une planete grace au "panneau planete" (infoBox)"""
         self.infoBox.setValue("Nom de la planète:", nom)  # TODO inspecter planete
 
@@ -286,18 +284,15 @@ class Gui(Tk):
             self.nbVaisseauxWidget.min = 0
             self.nbVaisseauxWidget.max = 0
         # TODO vérification planète humaine ou non
-
         self.infoBox.setValue("Nombre de vaisseaux:", nbVaisseaux)
 
     def rafraichirFlotte(self, flotte):
         """ Raffraichit le panneau Flotte """
         pass  # TODO Rafraichir flotte
 
-
     def getNbVaisseaux(self):
         """ Retourne le nombre de vaisseaux entres par l'utilisateur """
         return self.nbVaisseauxWidget.valeur.get()
-
 
     # ACTIVATION/DESACTIVATION WIDGET DU GUI #
     def activerFinTour(self, bool):
@@ -330,6 +325,14 @@ class Gui(Tk):
         y = int(event.y / self.galaxie.tailleTuile)
         coord = (x, y)
         self.callBack(UserActions.SELECT_PLANETE, coord)
+
+    def notifyPlanetRightClick(self, event):
+        x = int(event.x / self.galaxie.tailleTuile)
+        y = int(event.y / self.galaxie.tailleTuile)
+        coord = (x, y)
+        self.callBack(UserActions.SELECT_PLANETE_2, coord)
+
+
 
     def notifyValiderDeplacement(self):
         """ lorsque le bouton valider déplacement est termine """
