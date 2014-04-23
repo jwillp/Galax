@@ -12,4 +12,13 @@ class Planete:
         self.nbvisites # nombre de fois que l'humain a visite cette planete
         self.Vaisseaux # nombre de vaisseaux que possede la planete
 
-
+    def attaqueSurprise(self, nbDefenseurs , nbEnvahisseurs):
+        r = nbDefenseurs / nbEnvahisseurs
+        if r < 5
+        P = r/10
+        elif
+            r < 20
+            P = (3*r + 35) /100
+        else
+            P = 0.95
+ 
