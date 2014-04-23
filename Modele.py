@@ -22,9 +22,9 @@ class Modele:
         self.planeteMereHumains = None
         self.planeteMereGubrus = None
         self.planeteMereCzins = None
-        self.humain = Humain()
         self.gubru = Gubru()
         self.czin = Czin()
+        self.planeteSelectionnee = None
         
         
     def creerPlanetes(self):
@@ -74,6 +74,7 @@ class Modele:
             self.listePlanetes[self.planeteMereGubrus].isPlaneteMere = True
             self.listePlanetes[self.planeteMereGubrus].civilisation = Races.GUBRU
             self.listePlanetes[self.planeteMereGubrus].manufactures = 10
+            self.gubru.planeteMere = self.planeteMereGubrus
             
     def determinerPlaneteMereCzins(self):
         #trouve une planete qui n'est pas la planete mere humaine ou Gubru
@@ -84,6 +85,7 @@ class Modele:
             self.listePlanetes[self.planeteMereCzins].isPlaneteMere = True
             self.listePlanetes[self.planeteMereCzins].civilisation = Races.CZIN
             self.listePlanetes[self.planeteMereCzins].manufactures = 10
+            self.czin.planeteMere = self.planeteMereCzins
             
     def determinerPlanetesIndependantes(self):
         for n in range(0, len(self.listePlanetes)):
@@ -188,6 +190,9 @@ class Modele:
                 nombre +=1
                 
         return nombre
+    
+    def selectionnerPlanete(self, planete):
+        self.planeteSelectionnee = planete
     
     
         
