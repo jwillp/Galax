@@ -330,9 +330,21 @@ class Gui(Tk):
         # TODO vérification planète humaine ou non
         self.infoBox.setValue("Nombre de vaisseaux:", nbVaisseaux)
 
-    def rafraichirFlotte(self, flotte):
+    def rafraichirFlotte(self, data):
         """ Raffraichit le panneau Flotte """
         pass  # TODO Rafraichir flotte
+        if not data["planeteDepart"]:
+            data["planeteDepart"] = "-"
+        self.commandBox.setValue("Départ:", data["planeteDepart"]) #TODO mettre le nom
+
+        if not data["planeteArrivee"]:
+            data["planeteArrivee"] = "-"
+        self.commandBox.setValue("Destination:", data["planeteArrivee"])
+
+        if not data["distance"]:
+            data["distance"] = "-"
+        self.commandBox.setValue("Distance:", data["distance"])
+
 
     def getNbVaisseaux(self):
         """ Retourne le nombre de vaisseaux entres par l'utilisateur """

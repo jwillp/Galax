@@ -112,11 +112,30 @@ class Controleur():
 
         self.gui.activerBarreAugmentation(activation)
         self.gui.activerValiderDeplacement(activation)
+        self.rafraichirFlotte()
 
     def gestionSelection2(self, planete):
         self.modele.planeteSelectionnee2 = planete
         if self.modele.planeteSelectionnee != self.modele.planeteSelectionnee2:
             self.inspecterPlanete(planete)
+        self.rafraichirFlotte()
+
+
+
+    def rafraichirFlotte(self):
+        depart = self.modele.planeteSelectionnee
+        arrivee = self.modele.planeteSelectionnee2
+        data = {}
+        data["planeteDepart"] = depart
+        data["planeteArrivee"] = arrivee
+        if depart and  arrivee:
+            data["distance"] = self.modele.tempsDeplacement(depart, arrivee)
+        else:
+            data["distance"] = None
+        self.gui.rafraichirFlotte(data)
+
+
+
 
 
 
@@ -145,7 +164,32 @@ class Controleur():
 
     def validationDeplacement(self):
         """ Méthode gérant le cas de la validation d'un déplacement """
-        pass  # TODO  validation Deplacement
+
+
+        # Rafraîchissement du GUI
+        data = {}
+        data["anneeCourante"] = self.modele.anneeCourante
+        data["listePlanetes"] = self.modele.listePlanetes
+        data["nbPlanetesHumain"] = self.modele.listePlanetesRace(Races.HUMAIN)
+        data["nbPlanetesGubru"] = self.modele.listePlanetesRace(Races.GUBRU)
+        data["nbPlanetesCzin"] = self.modele.listePlanetesRace(Races.CZIN)
+        data["selection1"] = self.modele.planeteSelectionnee = None
+        data["selection2"] = self.modele.planeteSelectionnee2 = None
+        data["flottes"] = [] # TODO obetenir toute les flottes humaines
+        self.gui.rafraichir(data)
+
+        self.gui.resetNombreVaisseaux()
+        self.gui.activerBarreAugmentation(False)
+        self.gui.activerValiderDeplacement(False)
+
+        planeteDepart = self.modele.planeteSelectionnee
+        planeteArrive = self.modele.planeteSelectionnee2
+        nbVaisseaux = self.gui.getNbVaisseaux()
+        self.modele.ajoutFlottes(planeteDepart, planeteArrive, Races.HUMAIN, nbVaisseaux)
+
+
+
+
 
 
 

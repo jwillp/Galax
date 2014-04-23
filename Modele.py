@@ -130,7 +130,7 @@ class Modele:
     def tempsDeplacement(self, planeteDepart, planeteArrivee):
         #calcule le temps de deplacement comme si la distance est l'hypothenuse d'un triangle rectangle et arrondit a une decimale
         distanceX = (planeteArrivee.posX - planeteDepart.posX)**2
-        distanceY = (planeteArrivee.poY - planeteDepart.posY)**2
+        distanceY = (planeteArrivee.posY - planeteDepart.posY)**2
         distanceFinale = math.sqrt(distanceX+distanceY)
         return round(distanceFinale,1)
     
