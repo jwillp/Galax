@@ -57,22 +57,21 @@ class Controleur():
 
         # TODO Gestion Selection Planete
 
-
         self.modele.selectionnerPlanete(planete)
         self.gui.inspecterPlanete(planete.nom, planete.posX, planete.posY, planete.nbManufactures, planete.nbVaisseaux)
-        self.gui.selectionPlanete = planete
+
         self.gui.rafraichir(self.modele.anneeCourante, self.modele.listePlanetes,
                             self.modele.listePlanetesRace(Races.HUMAIN), self.modele.listePlanetesRace(Races.GUBRU),
-                            self.modele.listePlanetesRace(Races.CZIN))
+                            self.modele.listePlanetesRace(Races.CZIN),
+                            self.modele.planeteSelectionnee,
+                            self.modele.planeteSelectionnee
+        )
 
 
         if self.modele.planeteSelectionnee.civilisation == Races.HUMAIN:
             self.gui.activerBarreAugmentation(True)
             self.gui.activerValiderDeplacement(True)
 
-        # Si planete == Humain ==> Si on a pas déjà une flotte dans le modèle ==> faire une nouvelle flotte
-
-         # Check coordinates (tuples)
 
     def validationDeplacement(self):
         """ Méthode gérant le cas de la validation d'un déplacement """

@@ -65,10 +65,10 @@ class Galaxie(Frame):
 
         #Écouteur d'événements
         self.canvas.bind("<Button-1>", self.app.notifyPlanetClick)
+        self.canvas.bind("<Button-3>", self.app.notifyPlanetRightClick)
 
 
-
-    def draw(self, listePlanete):
+    def draw(self, listePlanete, selection1, selection2):
         self.canvas.delete("planete")
 
         for planete in listePlanete:  # TODO afficher les planètes
@@ -87,11 +87,19 @@ class Galaxie(Frame):
             elif planete.civilisation == Races.INDEPENDANT:
                 self.canvas.create_image(x, y, anchor=NW, image=self.indieImage, tag="planete")
 
-            print(self.app.selectionPlanete)
-            if planete == self.app.selectionPlanete:
+
+            if planete == selection1:
                 self.canvas.create_image(x, y, anchor=NW, image=self.selectionImage, tag="planete")
 
+            if planete == selection2:
+                self.canvas.create_image(x, y, anchor=NW, image=self.selectionImage, tag="planete")
 
+        if selection1 and selection2:
+            x1 = self.tailleTuile * selection1.posX
+            y1 = self.tailleTuile * selection1.posY
+            x2 = self.tailleTuile * selection2.posX
+            y2 = self.tailleTuile * selection2.posY
+            self.canvas.create_line(x1, y1, x2, y2, width=2, fill="yellow")
 
 
 
@@ -260,9 +268,9 @@ class Gui(Tk):
         """ Permet de lancer la boucle evenementielle principale du GUI """
         self.mainloop()
 
-    def rafraichir(self, anneeCourante, listePlanetes, nbPlaneteHumains, nbPlaneteGubru, nbPlaneteCzin):
+    def rafraichir(self, anneeCourante, listePlanetes, nbPlaneteHumains, nbPlaneteGubru, nbPlaneteCzin, selection1=None, selection2=None):
         """ rafraichit le panneau des infos des civilisations+la zone de jeu """
-        self.galaxie.draw(listePlanetes)
+        self.galaxie.draw(listePlanetes, selection1, selection2 )
 
         self.infoBox.setValue("Humains:", nbPlaneteHumains)
         self.infoBox.setValue("Gubru:", nbPlaneteHumains)
