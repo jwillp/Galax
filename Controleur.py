@@ -22,9 +22,19 @@ class Controleur():
         self.gui = Gui(self.gameLoop)
         self.gui.activerValiderDeplacement(False)
         self.gui.activerBarreAugmentation(False)
-        self.gui.rafraichir(self.modele.anneeCourante, self.modele.listePlanetes,
-                            self.modele.listePlanetesRace(Races.HUMAIN), self.modele.listePlanetesRace(Races.GUBRU),
-                            self.modele.listePlanetesRace(Races.CZIN))
+
+        data = {}
+        data["anneeCourante"] = self.modele.anneeCourante
+        data["listePlanetes"] = self.modele.listePlanetes
+        data["nbPlanetesHumain"] = self.modele.listePlanetesRace(Races.HUMAIN)
+        data["nbPlanetesGubru"] = self.modele.listePlanetesRace(Races.GUBRU)
+        data["nbPlanetesCzin"] = self.modele.listePlanetesRace(Races.CZIN)
+        data["selection1"] = None
+        data["selection2"] = None
+        data["flottesHumaines"] = None
+        data["flottes"] = []
+
+        self.gui.rafraichir(data)
 
 
     def initModele(self, nbCols, nbLignes, nbPlanetes):
@@ -64,14 +74,18 @@ class Controleur():
         else:
             self.gestionSelection2(planete)
 
+        # Données de rafraîchissement
+        data = {}
+        data["anneeCourante"] = self.modele.anneeCourante
+        data["listePlanetes"] = self.modele.listePlanetes
+        data["nbPlanetesHumain"] = self.modele.listePlanetesRace(Races.HUMAIN)
+        data["nbPlanetesGubru"] = self.modele.listePlanetesRace(Races.GUBRU)
+        data["nbPlanetesCzin"] = self.modele.listePlanetesRace(Races.CZIN)
+        data["selection1"] = self.modele.planeteSelectionnee
+        data["selection2"] = self.modele.planeteSelectionnee2
+        data["flottes"] = [] # TODO obetenir toute les flottes humaines
+        self.gui.rafraichir(data)
 
-
-        self.gui.rafraichir(self.modele.anneeCourante, self.modele.listePlanetes,
-                            self.modele.listePlanetesRace(Races.HUMAIN), self.modele.listePlanetesRace(Races.GUBRU),
-                            self.modele.listePlanetesRace(Races.CZIN),
-                            self.modele.planeteSelectionnee,
-                            self.modele.planeteSelectionnee2
-        )
 
 
 

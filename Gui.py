@@ -69,10 +69,28 @@ class Galaxie(Frame):
         self.canvas.bind("<Button-3>", self.app.notifyPlanetRightClick)
 
 
-    def draw(self, listePlanete, selection1, selection2):
+    def draw(self, data):
+        listePlanetes = data["listePlanetes"]
+        selection1 = data["selection1"]
+        selection2 = data["selection2"]
+        flottes = data["flottes"]
+
         self.canvas.delete("planete")
+        self.canvas.delete("flotte")
 
         #Affichage des liens entre les sélections
+        self.drawLienSelection(selection1, selection2)
+
+
+        # Affichage des flottes
+        self.drawFlottes(flottes)
+
+        # Affichage des planetes et Selections
+        self.drawPlanetes(listePlanetes, selection1, selection2)
+
+
+    def drawLienSelection(self, selection1, selection2):
+        """ Affiche le liens entre les selections """
         if selection1 and selection2:
             x1 = self.tailleTuile * selection1.posX + self.tailleTuile/2
             y1 = self.tailleTuile * selection1.posY + self.tailleTuile/2
@@ -81,8 +99,20 @@ class Galaxie(Frame):
             y2 = self.tailleTuile * selection2.posY + self.tailleTuile/2
             self.canvas.create_line(x1, y1, x2, y2, width=4, fill="#AAD106", tag="planete")
 
-        for planete in listePlanete:  # TODO afficher les planètes
+    def drawFlottes(self, flottes):
+        """ affiche la trajectoire de toutes les flottes humaines """
+        for flotte in flottes:
+            x1 = self.tailleTuile * flotte.planeteDepart.posX + self.tailleTuile/2
+            y1 = self.tailleTuile * flotte.planeteDepart.posY + self.tailleTuile/2
 
+            x2 = self.tailleTuile * flotte.planeteArrive.posX + self.tailleTuile/2
+            y2 = self.tailleTuile * flotte.planeteArrive.posY + self.tailleTuile/2
+            self.canvas.create_line(x1, y1, x2, y2, width=4, fill="#BF0E0E", tag="planete")
+
+
+    def drawPlanetes(self, listePlanetes, selection1, selection2):
+        """ affiche les planetes plus un marqueur de selection"""
+        for planete in listePlanetes:
             x = self.tailleTuile * planete.posX
             y = self.tailleTuile * planete.posY
 
@@ -104,9 +134,6 @@ class Galaxie(Frame):
 
             elif planete.civilisation == Races.INDEPENDANT:
                 self.canvas.create_image(x, y, anchor=NW, image=self.indieImage, tag="planete")
-
-
-
 
 
 
@@ -277,15 +304,15 @@ class Gui(Tk):
         """ Permet de lancer la boucle evenementielle principale du GUI """
         self.mainloop()
 
-    def rafraichir(self, anneeCourante, listePlanetes, nbPlaneteHumains, nbPlaneteGubru, nbPlaneteCzin, selection1=None, selection2=None):
+    def rafraichir(self, data):
         """ rafraichit le panneau des infos des civilisations+la zone de jeu """
-        self.galaxie.draw(listePlanetes, selection1, selection2 )
+        self.galaxie.draw(data)
 
-        self.infoBox.setValue("Humains:", nbPlaneteHumains)
-        self.infoBox.setValue("Gubru:", nbPlaneteHumains)
-        self.infoBox.setValue("Czin:", nbPlaneteHumains)
+        self.infoBox.setValue("Humains:", data["nbPlanetesHumain"])
+        self.infoBox.setValue("Gubru:",  data["nbPlanetesGubru"])
+        self.infoBox.setValue("Czin:",  data["nbPlanetesCzin"])
 
-        self.infoBox.setValue("Année courante:", anneeCourante)
+        self.infoBox.setValue("Année courante:", data["anneeCourante"])
 
 
     def inspecterPlanete(self, nom, x, y, capacite=None, nbVaisseaux=None):
