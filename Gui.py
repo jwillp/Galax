@@ -43,7 +43,7 @@ class Galaxie(Frame):
         self.arrierePlan = ImageTk.PhotoImage(Image.open("img/fond.jpg"))
 
         self.gubruImage = ImageTk.PhotoImage(Image.open("img/fire.png"))
-        self.czinImage = ImageTk.PhotoImage(Image.open("img/purple.png"))
+        self.czinImage = ImageTk.PhotoImage(Image.open("img/green.png"))
         self.humainImage = ImageTk.PhotoImage(Image.open("img/blue.png"))
         self.indieImage = ImageTk.PhotoImage(Image.open("img/white.png"))
         self.selectionImage = ImageTk.PhotoImage(Image.open("img/selection.png"))
