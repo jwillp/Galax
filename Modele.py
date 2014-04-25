@@ -24,6 +24,7 @@ class Modele:
         self.gubru = Gubru(self)
         self.czin = Czin(self)
         self.planeteSelectionnee = None
+        self.planeteSelectionnee2
         
         
     def creerPlanetes(self):
