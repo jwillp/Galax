@@ -74,6 +74,7 @@ class Galaxie(Frame):
         selection1 = data["selection1"]
         selection2 = data["selection2"]
         flottes = data["flottes"]
+        anneeCourante = data["anneeCourante"]
 
         self.canvas.delete("planete")
         self.canvas.delete("flotte")
@@ -82,15 +83,18 @@ class Galaxie(Frame):
         self.drawLienSelection(selection1, selection2)
 
 
-        # Affichage des flottes
-        self.drawFlottes(flottes)
+        # Affichage des trajectoires de flottes
+        self.drawTrajectoireFlottes(flottes)
 
         # Affichage des planetes et Selections
         self.drawPlanetes(listePlanetes, selection1, selection2)
 
+        # Affichage des Flottes
+        self.drawFlottes(flottes, anneeCourante)
+
 
     def drawLienSelection(self, selection1, selection2):
-        """ Affiche le liens entre les selections """
+        """ Affiche le liens entre les deux selections """
         if selection1 and selection2:
             x1 = self.tailleTuile * selection1.posX + self.tailleTuile/2
             y1 = self.tailleTuile * selection1.posY + self.tailleTuile/2
@@ -99,7 +103,7 @@ class Galaxie(Frame):
             y2 = self.tailleTuile * selection2.posY + self.tailleTuile/2
             self.canvas.create_line(x1, y1, x2, y2, width=4, fill="#AAD106", tag="planete")
 
-    def drawFlottes(self, flottes):
+    def drawTrajectoireFlottes(self, flottes):
         """ affiche la trajectoire de toutes les flottes humaines """
         for flotte in flottes:
             x1 = self.tailleTuile * flotte.planeteDepart.posX + self.tailleTuile/2
@@ -107,7 +111,28 @@ class Galaxie(Frame):
 
             x2 = self.tailleTuile * flotte.planeteArrive.posX + self.tailleTuile/2
             y2 = self.tailleTuile * flotte.planeteArrive.posY + self.tailleTuile/2
-            self.canvas.create_line(x1, y1, x2, y2, width=4, fill="#BF0E0E", tag="planete")
+            self.canvas.create_line(x1, y1, x2, y2, width=4, fill="#BF0E0E", tag="flotte")
+
+
+    def drawFlottes(self, flottes, anneeCourante):
+        """ affiche les flottes dépendement de leur completion selon le temps """
+        for flotte in flottes:
+
+            tailleFlotte = 16 #La taille d,une flotte en pixel
+
+            completion = anneeCourante - flotte.anneeDepart  #La completion sur denominateur
+            denominateur = flotte.anneArrivee - flotte.anneeDepart
+
+            completionSur1 = completion/denominateur
+
+            dx = (flotte.planeteArrivee.posX*self.tailleTuile - flotte.planeteDepart.posX*self.tailleTuile) * completionSur1 + flotte.planeteDepart.posX*self.tailleTuile
+            dy = (flotte.planeteArrivee.posY*self.tailleTuile - flotte.planeteDepart.posY*self.tailleTuile) * completionSur1 + flotte.planeteDepart.posY*self.tailleTuile
+
+            # TODO mettre une image à la place
+            self.canvas.create_oval(dx, dy, dx+tailleFlotte, dy+tailleFlotte, fill="green", tag="flotte")
+
+
+
 
 
     def drawPlanetes(self, listePlanetes, selection1, selection2):
