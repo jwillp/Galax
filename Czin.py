@@ -55,7 +55,7 @@ class Czin:
         #TODO : comprendre comment mettre le tout ensemble
                     
         def forceAttaque(self):
-            return self.parent.anneeCourante * self.nbr_vaisseaux_par_attaque * self.force_attaque_basique
+            return self.parent.tempsCourant * self.nbr_vaisseaux_par_attaque * self.force_attaque_basique
         
         def choixProchainePlaneteGrappe():
             max = 200000000000
@@ -93,7 +93,7 @@ class Czin:
                         
                 while self.baseOrigine.nbVaisseaux >= self.forceAttaque():
                     self.parent.ajoutFlotte(self.base, self.choixProchainePlaneteGrappe, Races.Czin, self.parent.tempsDeplacement(self.base, self.choixProchainePlaneteGrappe))
-                self.tempsConquete = self.parent.anneeCourante
+                self.tempsConquete = self.parent.tempsCourant
                 for n in range(0, len(self.grappeEnCours)):
                     if self.parent.tempsDeplacement(self.base, self.choixProchainePlaneteGrappe) > self.tempsConquete:
                         self.tempsConquete += self.parent.tempsDeplacement(self.base, self.choixProchainePlaneteGrappe)

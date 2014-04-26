@@ -108,6 +108,11 @@ class Controleur():
 
         self.gui.activerBarreAugmentation(activation)
         self.gui.activerValiderDeplacement(activation)
+        if self.gui.getNbVaisseaux() <= 0:
+            self.gui.activerValiderDeplacement(False)
+
+
+
         self.rafraichirFlotte()
 
     def gestionSelection2(self, planete):
@@ -155,16 +160,7 @@ class Controleur():
 
 
         # Rafraîchissement du GUI
-        data = {}
-        data["anneeCourante"] = self.modele.anneeCourante
-        data["listePlanetes"] = self.modele.listePlanetes
-        data["nbPlanetesHumain"] = self.modele.listePlanetesRace(Races.HUMAIN)
-        data["nbPlanetesGubru"] = self.modele.listePlanetesRace(Races.GUBRU)
-        data["nbPlanetesCzin"] = self.modele.listePlanetesRace(Races.CZIN)
-        data["selection1"] = self.modele.planeteSelectionnee = None
-        data["selection2"] = self.modele.planeteSelectionnee2 = None
-        data["flottes"] = self.modele.listeFlottes
-        self.gui.rafraichir(data)
+        self.rafraichirGui()
 
         self.gui.resetNombreVaisseaux()
         self.gui.activerBarreAugmentation(False)
@@ -175,17 +171,39 @@ class Controleur():
         nbVaisseaux = self.gui.getNbVaisseaux()
         self.modele.ajoutFlottes(planeteDepart, planeteArrive, Races.HUMAIN, nbVaisseaux)
 
+        self.rafraichirGui()
+
 
     def finTour(self):
         """ Méthode gérant le cas de la fin d'un tour"""
         self.modele.avancerTemps()
         # TODO gestion des notifications
+        self.gestionNotifications()
+        self.rafraichirGui()
+
+
+    def rafraichirGui(self):
+        data = {}
+        data["anneeCourante"] = self.modele.anneeCourante
+        data["listePlanetes"] = self.modele.listePlanetes
+        data["nbPlanetesHumain"] = self.modele.listePlanetesRace(Races.HUMAIN)
+        data["nbPlanetesGubru"] = self.modele.listePlanetesRace(Races.GUBRU)
+        data["nbPlanetesCzin"] = self.modele.listePlanetesRace(Races.CZIN)
+        data["selection1"] = self.modele.planeteSelectionnee
+        data["selection2"] = self.modele.planeteSelectionnee2
+        data["flottes"] = self.modele.listeFlottes
+        self.gui.rafraichir(data)
 
 
     def gestionChangementFlotte(self):
         """ Méthode gérant le cas du changement du nombre de vaisseaux d'une flotte """
         # TODO mettre flotte même nombre que vaisseaux GUI
+        if self.gui.getNbVaisseaux() <= 0:
+            activation = False
+        else:
+            activation = True
 
+        self.gui.activerValiderDeplacement(activation)
         self.gui.nbVaisseauxWidget.max = self.modele.planeteSelectionnee.nbVaisseaux
 
 

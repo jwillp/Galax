@@ -1,14 +1,17 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# TODO enlever la valeur par défaut de anneeDepart et l'inverser avec anneeArriver et modifier le modele en conséquence
 
 class Flotte:
 
-    def __init__(self, planeteDepart, planeteArrive, civilisation, nbVaisseaux, tempsArrivee):
+    def __init__(self, planeteDepart, planeteArrive, civilisation, nbVaisseaux, anneeArrivee, anneeDepart=0):
         self.planeteDepart = planeteDepart
-        self.planeteArrive = planeteArrive
+        self.planeteArrivee = planeteArrive
         self.civilisation = civilisation
         self.nbVaisseaux = nbVaisseaux
-        self.tempsArrivee = tempsArrivee
+        self.anneeArrivee = anneeArrivee
+        self.anneeDepart = anneeDepart
+
 
 

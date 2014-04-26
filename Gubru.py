@@ -25,9 +25,9 @@ class Gubru:
                 planetesGubrus.append(self.parent.listePlanetes[n]) # ajoute a une liste les planetes conquises par les gubrus et en cours d'attaque pour ne pas envoyer plusieurs flottes aux memes planetes
                 
         # cree les flottes a partir de planetes avec plus de 25 vaisseaux
-        for n in range(0, len(planetesGubrus)):
-            if planetesGubrus.nbVaisseaux > 25:
-                self.parent.ajoutFlotte(planetesGubrus[n], self.planeteMere, Races.GUBRU, planetesGubrus.nbVaisseaux-15)
+        for n in planetesGubrus:
+            if n.nbVaisseaux > 25:
+                self.parent.ajoutFlottes(n, self.planeteMere, Races.GUBRU, n.nbVaisseaux-15)
                 
     def flottesAttaque(self):
         #determine les planetes les plus pres non Gubru non attaquees et les ajoute a une liste de planetes attaquees et cree les flottes
@@ -35,7 +35,7 @@ class Gubru:
             while self.planeteMere.nbVaisseaux >= self.forceAttaque():
                 planeteChoisie = self.choisirPlaneteAttaquee()
                 self.listePlanetesAttaquees.append(planeteChoisie)
-                self.parent.ajoutFlotte(self.planeteMere, planeteChoisie, Races.GUBRU)
+                self.parent.ajoutFlottes(self.planeteMere, planeteChoisie, Races.GUBRU, 10) # TODO mettre un vrai nombre de vaisseaux
                 
     def retourFlottesConquete(self, planeteConquise):
         #gere le retour des flottes apres une conquete ( appellee dans le modele apres l'arrivee des flottes et le combat)
@@ -54,7 +54,7 @@ class Gubru:
                 for i in range(0, len(self.listePlanetesAttaquees)):
                     if self.parent.listePlanetes[n] != self.listePlanetesAttaquees[i]:
                         distance = self.parent.tempsDeplacement(self.planeteMere, self.parent.listePlanetes[n])
-                        planeteAttaquee = self.parent.listePlanete[n]
+                        planeteAttaquee = self.parent.listePlanetes[n]
         return planeteAttaquee
     
     def choisirNouvellePlaneteMere(self):

@@ -105,12 +105,13 @@ class Galaxie(Frame):
 
     def drawTrajectoireFlottes(self, flottes):
         """ affiche la trajectoire de toutes les flottes humaines """
+        # TODO voir avec le modèle pourquoi planeteArrivee est vide
         for flotte in flottes:
             x1 = self.tailleTuile * flotte.planeteDepart.posX + self.tailleTuile/2
             y1 = self.tailleTuile * flotte.planeteDepart.posY + self.tailleTuile/2
 
-            x2 = self.tailleTuile * flotte.planeteArrive.posX + self.tailleTuile/2
-            y2 = self.tailleTuile * flotte.planeteArrive.posY + self.tailleTuile/2
+            x2 = self.tailleTuile * flotte.planeteArrivee.posX + self.tailleTuile/2
+            y2 = self.tailleTuile * flotte.planeteArrivee.posY + self.tailleTuile/2
             self.canvas.create_line(x1, y1, x2, y2, width=4, fill="#BF0E0E", tag="flotte")
 
 
@@ -118,10 +119,12 @@ class Galaxie(Frame):
         """ affiche les flottes dépendement de leur completion selon le temps """
         for flotte in flottes:
 
-            tailleFlotte = 16 #La taille d,une flotte en pixel
+            tailleFlotte = 8 #La taille d,une flotte en pixel
 
             completion = anneeCourante - flotte.anneeDepart  #La completion sur denominateur
-            denominateur = flotte.anneArrivee - flotte.anneeDepart
+            denominateur = flotte.anneeArrivee - flotte.anneeDepart
+            if denominateur == 0:
+                return  #On ne peut diviser par 0
 
             completionSur1 = completion/denominateur
 
@@ -129,7 +132,8 @@ class Galaxie(Frame):
             dy = (flotte.planeteArrivee.posY*self.tailleTuile - flotte.planeteDepart.posY*self.tailleTuile) * completionSur1 + flotte.planeteDepart.posY*self.tailleTuile
 
             # TODO mettre une image à la place
-            self.canvas.create_oval(dx, dy, dx+tailleFlotte, dy+tailleFlotte, fill="green", tag="flotte")
+            self.canvas.create_oval(dx+self.tailleTuile/2, dy+self.tailleTuile/2, dx+tailleFlotte, dy+tailleFlotte, fill="green", tag="flotte")
+            # TODO Afficher le nombre de vaisseaux de la flotte
 
 
 

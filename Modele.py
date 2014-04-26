@@ -24,7 +24,7 @@ class Modele:
         self.gubru = Gubru(self)
         self.czin = Czin(self)
         self.planeteSelectionnee = None
-        self.planeteSelectionnee2 = None
+        self.notifications = []
         
         
     def creerPlanetes(self):
@@ -64,6 +64,8 @@ class Modele:
         self.listePlanetes[self.planeteMereHumains].civilisation = Races.HUMAIN
         self.listePlanetes[self.planeteMereHumains].nbManufactures = 10
         self.listePlanetes[self.planeteMereHumains].nbVaisseaux = 100
+        self.planeteMereHumains = self.listePlanetes[self.planeteMereHumains]
+
         
     def determinerPlaneteMereGubrus(self):
         #trouve une planete qui n'est pas la planete mere humaine
@@ -76,7 +78,7 @@ class Modele:
             self.listePlanetes[self.planeteMereGubrus].civilisation = Races.GUBRU
             self.listePlanetes[self.planeteMereGubrus].nbManufactures = 10
             self.listePlanetes[self.planeteMereGubrus].nbVaisseaux = 100
-            self.gubru.planeteMere = self.planeteMereGubrus
+            self.gubru.planeteMere = self.listePlanetes[self.planeteMereGubrus]
             
     def determinerPlaneteMereCzins(self):
         #trouve une planete qui n'est pas la planete mere humaine ou Gubru
@@ -88,7 +90,7 @@ class Modele:
             self.listePlanetes[self.planeteMereCzins].civilisation = Races.CZIN
             self.listePlanetes[self.planeteMereCzins].nbManufactures = 10
             self.listePlanetes[self.planeteMereCzins].nbVaisseaux = 100
-            self.czin.planeteMere = self.planeteMereCzins
+            self.czin.planeteMere = self.listePlanetes[self.planeteMereCzins]
             
     def determinerPlanetesIndependantes(self):
         for n in range(0, len(self.listePlanetes)):
@@ -96,7 +98,7 @@ class Modele:
     
     def ajoutFlottes(self, planeteDepart, planeteArrivee, civilisation, nbVaisseaux):
         #prends pour aquis que le constructeur de Flotte est : Flotte(planeteDepart, planeteArrivee, civilisation, nbVaisseaux)
-        self.listeFlottes.append(Flotte(planeteDepart, planeteArrivee, civilisation, nbVaisseaux, self.tempsCourant + self.tempsDeplacement(planeteDepart, planeteArrivee)))
+        self.listeFlottes.append(Flotte(planeteDepart, planeteArrivee, civilisation, nbVaisseaux, self.anneeCourante + self.tempsDeplacement(planeteDepart, planeteArrivee)))
         for planete in self.listePlanetes:
             if planete == planeteDepart:
                 planete.nbVaisseaux -= nbVaisseaux
@@ -104,7 +106,7 @@ class Modele:
     def arriveeFlottes(self):
         #verifie l'arrivee des flottes et gere le retour des flottes Gubrus d'une nouvelle conquete
         for n in range(0, len(self.listeFlottes)):
-            if self.listeFlottes[n].tempsArrivee == self.anneeCourante:
+            if self.listeFlottes[n].anneeArrivee == self.anneeCourante:
                 planeteAttaquee = self.trouverPlaneteAttaquee(self.listeFlottes[n])
                 if planeteAttaquee != -1:
                     planeteAttaquee.defense(self.listeFlottes[n])
@@ -116,7 +118,7 @@ class Modele:
     def trouverPlaneteAttaquee(self, flotte):
         #trouve la planete attaquee
         for n in range(0, len(self.listePlanetes)):
-            if self.listePlanetes[n] == flotte.positionArrivee:
+            if self.listePlanetes[n] == flotte.planeteArrivee:
                 return self.listePlanetes[n]
             else:
                 return -1
@@ -129,6 +131,9 @@ class Modele:
         self.listeFlottesSuprimmees.clear()
         
     def tempsDeplacement(self, planeteDepart, planeteArrivee):
+        if not planeteDepart or not planeteArrivee:
+            return 0
+
         #calcule le temps de deplacement comme si la distance est l'hypothenuse d'un triangle rectangle et arrondit a une decimale
         distanceX = (planeteArrivee.posX - planeteDepart.posX)**2
         distanceY = (planeteArrivee.posY - planeteDepart.posY)**2
@@ -151,12 +156,14 @@ class Modele:
         for n in range(0,len(listePlanetesPlusAttaquees)):
             self.gubru.listePlanetesAttaquees.remove(listePlanetesPlusAttaquees[n])
                     
-        listePlanetesPlusAttaquees.clear()
+        #listePlanetesPlusAttaquees.clear()
+        listePlanetesPlusAttaquees[:] = [] #Clear
+
        
     def avancerTemps(self):
         #fait les taches d'une annee complete sans inclure les actions humaines
         self.gubru.creerFlottes()
-        self.czin.creerFlottes() #TODO : pas mal tout des Czin 
+        #self.czin.creerFlottes() #TODO : pas mal tout des Czin
         for n in range(0,9):
             self.arriveeFlottes()
             self.anneeCourante += 0.1
