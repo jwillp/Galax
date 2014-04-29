@@ -34,7 +34,6 @@ class Modele:
     def chargerNomPlanetes(self):
         fichier = open('noms_planetes.data', 'r')
         self.nomPlanetes = fichier.readlines()
-        print(len(self.nomPlanetes))
         fichier.close()
 
     def obtenirNom(self):
@@ -42,8 +41,6 @@ class Modele:
 
     def creerPlanetes(self):
         self.chargerNomPlanetes()
-        print(self.obtenirNom())
-
         for n in range(0, self.nombrePlanetes):
             self.listePlanetes.append(Planete(None, None, None, self.obtenirNom()))
             self.listePos = [None, None]
@@ -110,7 +107,6 @@ class Modele:
     def ajoutFlottes(self, planeteDepart, planeteArrivee, civilisation, nbVaisseaux):
         #prends pour aquis que le constructeur de Flotte est : Flotte(planeteDepart,
         # planeteArrivee, civilisation, nbVaisseaux)
-        print("nbVaisseaux: %s" % nbVaisseaux)
         self.listeFlottes.append(Flotte(planeteDepart, planeteArrivee, civilisation, nbVaisseaux,
                                         self.anneeCourante +
                                         self.tempsDeplacement(planeteDepart, planeteArrivee), self.anneeCourante))
@@ -121,7 +117,6 @@ class Modele:
         #verifie l'arrivee des flottes et gere le retour des flottes Gubrus d'une nouvelle conquete
 
         for flotte in self.listeFlottes:
-            print("%s =?= %s" % (flotte.anneeArrivee, round(self.anneeCourante, 1)))
             if round(flotte.anneeArrivee, 1) == round(self.anneeCourante, 1):
 
                 planeteAttaquee = flotte.planeteArrivee

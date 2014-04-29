@@ -285,7 +285,7 @@ class Gui(Tk):
 
         self.commandBox.titleBackground = self.commandBox.background
         self.commandBox.insertNewTitle("Nombre de vaisseaux")
-        self.nbVaisseauxWidget = BarreAugmentation(self.commandBox, 0)
+        self.nbVaisseauxWidget = Scale(self.commandBox, orient=HORIZONTAL, command=self.notifyFlotteChange)
         self.nbVaisseauxWidget.commande = self.notifyFlotteChange
         self.commandBox.insertWidget("nbVaisseaux", self.nbVaisseauxWidget)
         self.commandBox.insertSeperator(3)
@@ -351,8 +351,8 @@ class Gui(Tk):
 
         if not nbVaisseaux:
             nbVaisseaux = "-"
-            self.nbVaisseauxWidget.min = 0
-            self.nbVaisseauxWidget.max = 0
+            self.nbVaisseauxWidget.configure(from_=0)
+            self.nbVaisseauxWidget.configure(to_= 0)
         # TODO vérification planète humaine ou non
         self.infoBox.setValue("Nombre de vaisseaux:", nbVaisseaux)
 
@@ -378,11 +378,11 @@ class Gui(Tk):
 
     def getNbVaisseaux(self):
         """ Retourne le nombre de vaisseaux entres par l'utilisateur """
-        return self.nbVaisseauxWidget.valeur.get()
+        return self.nbVaisseauxWidget.get()
 
     def resetNombreVaisseaux(self):
-        self.nbVaisseauxWidget.valeur.set(0)
-        self.nbVaisseauxWidget.labelValeur.configure(text=self.nbVaisseauxWidget.valeur.get())
+        self.nbVaisseauxWidget.set(0)
+
 
 
     # ACTIVATION/DESACTIVATION WIDGET DU GUI #
@@ -404,7 +404,11 @@ class Gui(Tk):
 
     def activerBarreAugmentation(self, isEnabled):
         """ permet d'activer/desactiver la barre  nb vaisseaux flotte """
-        self.nbVaisseauxWidget.activer(isEnabled)
+        if isEnabled:
+            isEnabled = 'normal'
+        else:
+            isEnabled = 'disabled'
+        self.nbVaisseauxWidget.configure(state=isEnabled)
 
 
     # NOTIFICATION D'ENTRÉE UTILISATEUR
@@ -431,14 +435,12 @@ class Gui(Tk):
         """ lorsque le bouton terminer tour est presse """
         self.callBack(UserActions.VALIDER_TOUR)
 
-    def notifyFlotteChange(self):
+    def notifyFlotteChange(self, event):
         """ si on augmente ou reduit le nombre de vaisseaux """
         self.callBack(UserActions.FLOTTE_CHANGEMEMT)
 
 
 ### CUSTOM WIDGETS #####
-
-
 class Box(Frame):
     def __init__(self, parent):
         #Default Color values
@@ -556,60 +558,6 @@ class Console(Frame):
         message = "[Année: %s] Les %s ont été annihilé" % race
         self.insert(message)
 
-
-class BarreAugmentation(Frame):
-    def __init__(self, parent, max, min=0, step=1):
-        Frame.__init__(self, parent, height=60, background="blue")
-
-
-
-        #Parameteres
-        self.valeur = IntVar()
-        self.valeur.set(0)
-        self.step = 1
-        self.min = 0
-        self.max = max
-
-        self.commande = None  #La commande à appaler en cas d'action event
-
-
-
-        #GUI
-        self.boutonAug = Button(self, text=" + ", command=self.augmenter)  #augmenter
-        self.labelValeur = Label(self, text=self.valeur.get())
-        self.boutonRed = Button(self, text=" - ", command=self.reduire)  #Réduire
-
-        self.boutonRed.grid(column=0, row=0, sticky=N + W + E + S)
-        self.labelValeur.grid(column=1, row=0, sticky=N + W + E + S)
-        self.boutonAug.grid(column=2, row=0, sticky=N + W + E + S)
-        self.grid_columnconfigure(1, weight=1)
-
-
-    def augmenter(self):
-        self.valeur.set(self.valeur.get() + self.step)
-        if (self.valeur.get() > self.max):
-            self.valeur.set(self.max)
-        self.labelValeur.configure(text=self.valeur.get())
-        self.commande()
-
-
-    def reduire(self):
-        self.valeur.set(self.valeur.get() - self.step)
-        if (self.valeur.get() < self.min):
-            self.valeur.set(self.min)
-        self.labelValeur.configure(text=self.valeur.get())
-        self.commande()
-
-
-    def activer(self, bool):
-        """ permet d'activer/desactiver le widget """
-        if bool:
-            bool = 'active'
-        else:
-            bool = 'disabled'
-        self.boutonAug.configure(state=bool)
-        self.boutonRed.configure(state=bool)
-        self.labelValeur.configure(state=bool)
 
 
 def main():

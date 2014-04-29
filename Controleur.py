@@ -37,14 +37,16 @@ class Controleur():
 
         self.gui.rafraichir(data)
 
-
     def initModele(self, nbCols, nbLignes, nbPlanetes):
         self.modele = Modele(nbCols, nbLignes, nbPlanetes)
         self.modele.creerPlanetes()
         self.modele.planeteSelectionnee2 = None  # TODO effacer cette ligne lorsque le modele sera modifié
 
-    def gameLoop(self, userAction, coordinates=None):
+    def executer(self):
+        """ permet de lancer le GUI """
+        self.gui.run()
 
+    def gameLoop(self, userAction, coordinates=None):
         """ the coordiantes should be tuples """
         if userAction == UserActions.VALIDER_DEPLACEMENT:
             self.validationDeplacement()
@@ -64,10 +66,7 @@ class Controleur():
         """ Méthode gérant le cas de la sélection d'une planète """
         planete = self.modele.getPlaneteAt(coordonnee[0], coordonnee[1])
 
-
-        # TODO Gestion Selection Planete
-
-        if not planete:
+        if not planete:  # Si on clique dans le vide
             if userAction is UserActions.SELECT_PLANETE:
                 self.modele.planeteSelectionnee = None
                 self.gui.resetNombreVaisseaux()
@@ -77,56 +76,57 @@ class Controleur():
             else:
                 self.modele.planeteSelectionnee2 = None
         else:
+            self.inspecterPlanete(planete)
             if userAction is UserActions.SELECT_PLANETE:
                 self.gestionSelection1(planete)
             else:
                 self.gestionSelection2(planete)
+                self.rafraichirFlotte()
 
-        # Données de rafraîchissement
-        data = {}
-        data["anneeCourante"] = self.modele.anneeCourante
-        data["listePlanetes"] = self.modele.listePlanetes
-        data["nbPlanetesHumain"] = self.modele.listePlanetesRace(Races.HUMAIN)
-        data["nbPlanetesGubru"] = self.modele.listePlanetesRace(Races.GUBRU)
-        data["nbPlanetesCzin"] = self.modele.listePlanetesRace(Races.CZIN)
-        data["selection1"] = self.modele.planeteSelectionnee
-        data["selection2"] = self.modele.planeteSelectionnee2
-        data["flottes"] = self.modele.listeFlottes
-        self.gui.rafraichir(data)
+        self.rafraichirGui()
 
 
     def gestionSelection1(self, planete):
         self.modele.planeteSelectionnee = planete
-        self.inspecterPlanete(planete)
 
         if self.modele.planeteSelectionnee.civilisation == Races.HUMAIN:
+            self.gui.nbVaisseauxWidget.configure(to_=planete.nbVaisseaux)
             activation = True
         else:
             activation = False
             self.gui.resetNombreVaisseaux()
 
         self.gui.activerBarreAugmentation(activation)
-        self.gui.activerValiderDeplacement(activation)
-        if self.gui.getNbVaisseaux() <= 0:
-            self.gui.activerValiderDeplacement(False)
 
-
-
-        self.rafraichirFlotte()
 
     def gestionSelection2(self, planete):
         self.modele.planeteSelectionnee2 = planete
-        if self.modele.planeteSelectionnee != self.modele.planeteSelectionnee2:
-            self.inspecterPlanete(planete)
-        self.rafraichirFlotte()
+
+        if self.modele.planeteSelectionnee.civilisation == Races.HUMAIN:
+            self.gui.nbVaisseauxWidget.configure(to_=self.modele.planeteSelectionnee.nbVaisseaux)
+            activation = True
+        else:
+            activation = False
+            self.gui.resetNombreVaisseaux()
+
+        self.gui.activerBarreAugmentation(activation)
+
+
+    def gestionChangementFlotte(self):
+        """ Méthode gérant le cas du changement du nombre de vaisseaux d'une flotte """
+        if self.gui.getNbVaisseaux() <= 0 or not self.modele.planeteSelectionnee2:
+            activation = False
+        else:
+            activation = True
+
+        self.gui.activerValiderDeplacement(activation)
+
 
 
     def rafraichirFlotte(self):
         depart = self.modele.planeteSelectionnee
         arrivee = self.modele.planeteSelectionnee2
-        data = {}
-        data["planeteDepart"] = depart
-        data["planeteArrivee"] = arrivee
+        data = {"planeteDepart": depart, "planeteArrivee": arrivee}
         if depart and arrivee:
             data["distance"] = self.modele.tempsDeplacement(depart, arrivee)
         else:
@@ -135,7 +135,7 @@ class Controleur():
 
 
     def inspecterPlanete(self, planete):
-        """ Inspecte une lpanete selon le niveau de connaissance """
+        """ Inspecte une la planete selon le niveau de connaissance """
         if planete.civilisation == Races.HUMAIN:
             self.gui.inspecterPlanete(planete.nom, planete.posX, planete.posY, planete.nbManufactures,
                                       planete.nbVaisseaux)
@@ -174,7 +174,6 @@ class Controleur():
     def finTour(self):
         """ Méthode gérant le cas de la fin d'un tour"""
         self.modele.avancerTemps()
-        # TODO gestion des notifications
         self.gestionNotifications()
         self.rafraichirGui()
 
@@ -192,21 +191,11 @@ class Controleur():
         self.gui.rafraichir(data)
 
 
-    def gestionChangementFlotte(self):
-        """ Méthode gérant le cas du changement du nombre de vaisseaux d'une flotte """
-        # TODO mettre flotte même nombre que vaisseaux GUI
-        if self.gui.getNbVaisseaux() <= 0:
-            activation = False
-        else:
-            activation = True
-
-        self.gui.activerValiderDeplacement(activation)
-        self.gui.nbVaisseauxWidget.max = self.modele.planeteSelectionnee.nbVaisseaux
 
 
-    def executer(self):
-        """ permet de lancer le GUI """
-        self.gui.run()
+
+
+
 
     def gestionNotifications(self):
         """ Permet de gérer les notifications """
@@ -246,7 +235,6 @@ class Controleur():
             self.gui.consoleEnnemis.defensePlanete(notif.annee, notif.defenseur, notif.attaquant, notif.planete)
 
         else:  # Défense ratée, perte planète gain pour autre
-
             if isHumainConcernes:
                 self.gui.consoleHumains.victoirePlanete(notif.annee, notif.attaquant, notif.planete)
                 self.gui.consoleHumains.pertePlanete(notif.annee, notif.defenseur, notif.attaquant, notif.planete)
