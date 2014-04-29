@@ -54,7 +54,7 @@ class Controleur():
         elif userAction == UserActions.VALIDER_TOUR:
             self.finTour()
 
-        elif userAction is UserActions.SELECT_PLANETE or UserActions.SELECT_PLANETE_2:
+        elif userAction is UserActions.SELECT_PLANETE or userAction is UserActions.SELECT_PLANETE_2:
             self.gestionSelectionPlanete(coordinates, userAction)
 
         elif userAction == UserActions.FLOTTE_CHANGEMEMT:
@@ -81,13 +81,13 @@ class Controleur():
                 self.gestionSelection1(planete)
             else:
                 self.gestionSelection2(planete)
+                self.rafraichirFlotte()
 
         self.rafraichirGui()
 
 
     def gestionSelection1(self, planete):
         self.modele.planeteSelectionnee = planete
-
 
         if self.modele.planeteSelectionnee.civilisation == Races.HUMAIN:
             self.gui.nbVaisseauxWidget.configure(to_=planete.nbVaisseaux)
@@ -97,13 +97,30 @@ class Controleur():
             self.gui.resetNombreVaisseaux()
 
         self.gui.activerBarreAugmentation(activation)
-        self.gui.activerValiderDeplacement(activation)
 
-        self.rafraichirFlotte()
 
     def gestionSelection2(self, planete):
         self.modele.planeteSelectionnee2 = planete
-        self.rafraichirFlotte()
+
+        if self.modele.planeteSelectionnee.civilisation == Races.HUMAIN:
+            self.gui.nbVaisseauxWidget.configure(to_=self.modele.planeteSelectionnee.nbVaisseaux)
+            activation = True
+        else:
+            activation = False
+            self.gui.resetNombreVaisseaux()
+
+        self.gui.activerBarreAugmentation(activation)
+
+
+    def gestionChangementFlotte(self):
+        """ Méthode gérant le cas du changement du nombre de vaisseaux d'une flotte """
+        if self.gui.getNbVaisseaux() <= 0 or not self.modele.planeteSelectionnee2:
+            activation = False
+        else:
+            activation = True
+
+        self.gui.activerValiderDeplacement(activation)
+
 
 
     def rafraichirFlotte(self):
@@ -174,14 +191,7 @@ class Controleur():
         self.gui.rafraichir(data)
 
 
-    def gestionChangementFlotte(self):
-        """ Méthode gérant le cas du changement du nombre de vaisseaux d'une flotte """
-        if self.gui.getNbVaisseaux() <= 0 or not self.modele.planeteSelectionnee2:
-            activation = False
-        else:
-            activation = True
 
-        self.gui.activerValiderDeplacement(activation)
 
 
 
@@ -225,7 +235,6 @@ class Controleur():
             self.gui.consoleEnnemis.defensePlanete(notif.annee, notif.defenseur, notif.attaquant, notif.planete)
 
         else:  # Défense ratée, perte planète gain pour autre
-
             if isHumainConcernes:
                 self.gui.consoleHumains.victoirePlanete(notif.annee, notif.attaquant, notif.planete)
                 self.gui.consoleHumains.pertePlanete(notif.annee, notif.defenseur, notif.attaquant, notif.planete)

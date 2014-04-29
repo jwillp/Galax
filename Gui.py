@@ -285,7 +285,7 @@ class Gui(Tk):
 
         self.commandBox.titleBackground = self.commandBox.background
         self.commandBox.insertNewTitle("Nombre de vaisseaux")
-        self.nbVaisseauxWidget = Scale(self.commandBox, orient=HORIZONTAL)
+        self.nbVaisseauxWidget = Scale(self.commandBox, orient=HORIZONTAL, command=self.notifyFlotteChange)
         self.nbVaisseauxWidget.commande = self.notifyFlotteChange
         self.commandBox.insertWidget("nbVaisseaux", self.nbVaisseauxWidget)
         self.commandBox.insertSeperator(3)
@@ -435,7 +435,7 @@ class Gui(Tk):
         """ lorsque le bouton terminer tour est presse """
         self.callBack(UserActions.VALIDER_TOUR)
 
-    def notifyFlotteChange(self):
+    def notifyFlotteChange(self, event):
         """ si on augmente ou reduit le nombre de vaisseaux """
         self.callBack(UserActions.FLOTTE_CHANGEMEMT)
 

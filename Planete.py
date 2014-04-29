@@ -19,8 +19,8 @@ class Planete:
         self.nbVisites = 0  # nombre de fois que l'humain a visite cette planete
         self.nbVaisseaux = self.nbManufactures  # nombre de vaisseaux que possede la planete
 
-
     def seDefendre(self, flotte, listeNotif, anneeCourante):
+        notif = Affrontement(anneeCourante, self, flotte.civilisation, self.civilisation, False)
 
         if flotte.civilisation == Races.HUMAIN:
             self.nbVisites += 1
@@ -53,6 +53,8 @@ class Planete:
                 self.nbVaisseaux = defenseurs
                 flotte.nbVaisseaux = attaquants
 
+
+
         if flotte.nbVaisseaux > self.nbVaisseaux:
             self.nbVaisseaux = flotte.nbVaisseaux
             self.civilisation = flotte.civilisation
@@ -61,8 +63,9 @@ class Planete:
             isDefenseReussie = True
 
         #TODO notification de affrontement selon issue du combat
-            notif = Affrontement(anneeCourante, self, flotte.civilisation, self.civilisation, isDefenseReussie)
-            listeNotif.append(notif)
+
+        notif.isDefenseReussie = isDefenseReussie
+        listeNotif.append(notif)
 
 
 
