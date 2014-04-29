@@ -106,6 +106,7 @@ class Galaxie(Frame):
     def drawTrajectoireFlottes(self, flottes):
         """ affiche la trajectoire de toutes les flottes humaines """
         # TODO voir avec le modèle pourquoi planeteArrivee est vide
+
         for flotte in flottes:
             x1 = self.tailleTuile * flotte.planeteDepart.posX + self.tailleTuile/2
             y1 = self.tailleTuile * flotte.planeteDepart.posY + self.tailleTuile/2
@@ -341,7 +342,10 @@ class Gui(Tk):
         self.infoBox.setValue("Gubru:",  data["nbPlanetesGubru"])
         self.infoBox.setValue("Czin:",  data["nbPlanetesCzin"])
 
-        self.infoBox.setValue("Année courante:", data["anneeCourante"])
+
+        anneeCourante = int(data["anneeCourante"])
+
+        self.infoBox.setValue("Année courante:", anneeCourante)
 
 
     def inspecterPlanete(self, nom, x, y, capacite=None, nbVaisseaux=None):

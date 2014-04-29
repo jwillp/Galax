@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import math
+import random
 
 
 class Planete:
@@ -17,37 +18,43 @@ class Planete:
 
     def seDefendre(self, flotte):
         # TODO Création notification affrontement
+
+
+
         effetSurprise = False
         attaquants = flotte.nbVaisseaux
         defenseurs = self.nbVaisseaux
 
-        probSurprise = self.calculEffetSurprise()*100
-        rnd = math.randint(0, 100)
-        if 0 <= rnd < probSurprise:
-            effetSurprise = True
-            attaquants, defenseur = defenseurs, attaquants
+        if defenseurs > 0:
+            probSurprise = self.calculEffetSurprise(defenseurs, attaquants)*100
 
-        indexAttanquant = attaquants
-        indexDefenseur = defenseurs
+            rnd = random.randrange(0, 100)
+            if 0 <= rnd < probSurprise:
+                effetSurprise = True
+                attaquants, defenseur = defenseurs, attaquants
 
-        while attaquants != 0 and defenseurs != 0:
-            rand = math.randint(0, 10)
-            if 0 <= rand <= 7:  # Victoire du defenseur
-                indexAttanquant -= 1
-            else:  # Victoire de l'attaquant
-                indexDefenseur -= 1
+                indexAttanquant = attaquants
+                indexDefenseur = defenseurs
 
-        if effetSurprise:
-            attaquants, defenseur = defenseurs, attaquants
+                while attaquants != 0 and defenseurs != 0:
+                    rand = random.randrange(0, 10)
+                    if 0 <= rand <= 7:  # Victoire du defenseur
+                        indexAttanquant -= 1
+                    else:  # Victoire de l'attaquant
+                        indexDefenseur -= 1
 
-        self.nbVaisseaux = defenseurs
-        flotte.nbVaisseaux = attaquants
+                if effetSurprise:
+                    attaquants, defenseur = defenseurs, attaquants
+
+                self.nbVaisseaux = defenseurs
+                flotte.nbVaisseaux = attaquants
 
         if flotte.nbVaisseaux > self.nbVaisseaux:
             self.nbVaisseaux = flotte.nbVaisseaux
             self.civilisation = flotte.civilisation
 
-        #TODO modification de affrontement selon issue du combat
+        #TODO notification de affrontement selon issue du combat
+
 
 
 

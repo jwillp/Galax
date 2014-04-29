@@ -5,7 +5,7 @@
 
 class Flotte:
 
-    def __init__(self, planeteDepart, planeteArrive, civilisation, nbVaisseaux, anneeArrivee, anneeDepart=0):
+    def __init__(self, planeteDepart, planeteArrive, civilisation, nbVaisseaux, anneeArrivee, anneeDepart):
         self.planeteDepart = planeteDepart
         self.planeteArrivee = planeteArrive
         self.civilisation = civilisation

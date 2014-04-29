@@ -67,7 +67,6 @@ class Controleur():
 
         # TODO Gestion Selection Planete
 
-
         if not planete:
             if userAction is UserActions.SELECT_PLANETE:
                 self.modele.planeteSelectionnee = None
@@ -162,15 +161,17 @@ class Controleur():
         # Rafraîchissement du GUI
         self.rafraichirGui()
 
-        self.gui.resetNombreVaisseaux()
-        self.gui.activerBarreAugmentation(False)
-        self.gui.activerValiderDeplacement(False)
-
         planeteDepart = self.modele.planeteSelectionnee
         planeteArrive = self.modele.planeteSelectionnee2
         nbVaisseaux = self.gui.getNbVaisseaux()
+
+
         self.modele.ajoutFlottes(planeteDepart, planeteArrive, Races.HUMAIN, nbVaisseaux)
 
+
+        self.gui.resetNombreVaisseaux()
+        self.gui.activerBarreAugmentation(False)
+        self.gui.activerValiderDeplacement(False)
         self.rafraichirGui()
 
 
