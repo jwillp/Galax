@@ -156,8 +156,6 @@ class Controleur():
 
     def validationDeplacement(self):
         """ Méthode gérant le cas de la validation d'un déplacement """
-
-
         # Rafraîchissement du GUI
         self.rafraichirGui()
 
@@ -165,9 +163,7 @@ class Controleur():
         planeteArrive = self.modele.planeteSelectionnee2
         nbVaisseaux = self.gui.getNbVaisseaux()
 
-
         self.modele.ajoutFlottes(planeteDepart, planeteArrive, Races.HUMAIN, nbVaisseaux)
-
 
         self.gui.resetNombreVaisseaux()
         self.gui.activerBarreAugmentation(False)
@@ -212,66 +208,51 @@ class Controleur():
         """ permet de lancer le GUI """
         self.gui.run()
 
-    # NOTIFICATIONS #
     def gestionNotifications(self):
+        """ Permet de gérer les notifications """
+
         notifications = self.modele.notifications
         for notif in notifications:
             if isinstance(notif, Affrontement):
                 self.gestionNotifAffrontement(notif)
             elif isinstance(notif, Annihilation):
                 self.gestionNotifAnnihilation(notif)
-
-
+        self.modele.notifications = []  # On vide les notifications
 
     def gestionNotifAnnihilation(self, notif):
+        """ Gestion notifications d'annihilation """
         self.gui.consoleHumains.annihilation(notif.annee, notif.race)
         self.gui.consoleEnnemis.annihilation(notif.annee, notif.race)
 
-
     def gestionNotifAffrontement(self, notif):
+        """ Gestion notifications d'affrontement """
 
-        #Avec
         isHumainConcernes = False
         if notif.attaquant is Races.HUMAIN or notif.defenseur is Races.HUMAIN:
             isHumainConcernes = True
 
         # il y eu affrontement
-        self.gui.consoleEnnemis.affrontementPlanete(notif.annee, notif.attaquant, notif.defenseur, notif.planete)
+
         if isHumainConcernes:
             self.gui.consoleHumains.affrontementPlanete(notif.annee, notif.attaquant, notif.defenseur, notif.planete)
 
+        self.gui.consoleEnnemis.affrontementPlanete(notif.annee, notif.attaquant, notif.defenseur, notif.planete)
+
         if notif.isDefenseReussie:  # Défense réussie
-            self.gui.consoleEnnemis.defensePlanete(notif.annee, notif.defenseur, notif.attaquant, notif.planete)
+
             if isHumainConcernes:
                 self.gui.consoleHumains.defensePlanete(notif.annee, notif.defenseur, notif.attaquant, notif.planete)
+
+            self.gui.consoleEnnemis.defensePlanete(notif.annee, notif.defenseur, notif.attaquant, notif.planete)
+
         else:  # Défense ratée, perte planète gain pour autre
+
+            if isHumainConcernes:
+                self.gui.consoleHumains.victoirePlanete(notif.annee, notif.attaquant, notif.planete)
+                self.gui.consoleHumains.pertePlanete(notif.annee, notif.defenseur, notif.attaquant, notif.planete)
+
             self.gui.consoleEnnemis.pertePlanete(notif.annee, notif.defenseur, notif.attaquant, notif.planete)
             self.gui.consoleEnnemis.victoirePlanete(notif.annee, notif.attaquant, notif.planete)
-            if isHumainConcernes:
-                self.gui.consoleHumains.pertePlanete(notif.annee, notif.defenseur, notif.attaquant, notif.planete)
-                self.gui.consoleHumains.victoirePlanete(notif.annee, notif.attaquant, notif.planete)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# TODO Selon les cas, désactiver certains boutons du GUI pour empêcher des problèmes #
-# Le contrôleur nécessitera certaine des méthodes suivantes du modèle
-# getNbPlanetesGubru() OU getPlanetesGubru()
-# getNbPlanetesCzins() OU getPlanetesCzins()
-# getNbPlanetesHumaines() OU getPlanetesHumaines()
-# getPlaneteAt(x,y) ==> permet d'obtenir une planète selon coordonnée
 
 
 def main():
@@ -280,4 +261,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

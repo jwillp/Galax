@@ -3,12 +3,12 @@
 #Python 3.x
 from Races import Races
 
-try: #3.x
+try:  #3.x
     from tkinter import *
     from tkinter import ttk
 
 except (ImportError):
-    from Tkinter import * #2.x
+    from Tkinter import *  #2.x
     import ttk
 
 from PIL import Image
@@ -60,7 +60,7 @@ class Galaxie(Frame):
 
         #Dessiner la canvas
         image = Image.open("img/fond.jpg")
-        self.arrierePlan = image.resize(( self.canvas.winfo_width(), self.canvas.winfo_height()), Image.ANTIALIAS)
+        self.arrierePlan = image.resize((self.canvas.winfo_width(), self.canvas.winfo_height()), Image.ANTIALIAS)
         self.arrierePlan = ImageTk.PhotoImage(image)
         self.canvas.create_image(0, 0, anchor=NW, image=self.arrierePlan)
 
@@ -96,11 +96,11 @@ class Galaxie(Frame):
     def drawLienSelection(self, selection1, selection2):
         """ Affiche le liens entre les deux selections """
         if selection1 and selection2:
-            x1 = self.tailleTuile * selection1.posX + self.tailleTuile/2
-            y1 = self.tailleTuile * selection1.posY + self.tailleTuile/2
+            x1 = self.tailleTuile * selection1.posX + self.tailleTuile / 2
+            y1 = self.tailleTuile * selection1.posY + self.tailleTuile / 2
 
-            x2 = self.tailleTuile * selection2.posX + self.tailleTuile/2
-            y2 = self.tailleTuile * selection2.posY + self.tailleTuile/2
+            x2 = self.tailleTuile * selection2.posX + self.tailleTuile / 2
+            y2 = self.tailleTuile * selection2.posY + self.tailleTuile / 2
             self.canvas.create_line(x1, y1, x2, y2, width=4, fill="#AAD106", tag="planete")
 
     def drawTrajectoireFlottes(self, flottes):
@@ -108,11 +108,11 @@ class Galaxie(Frame):
         # TODO voir avec le modèle pourquoi planeteArrivee est vide
 
         for flotte in flottes:
-            x1 = self.tailleTuile * flotte.planeteDepart.posX + self.tailleTuile/2
-            y1 = self.tailleTuile * flotte.planeteDepart.posY + self.tailleTuile/2
+            x1 = self.tailleTuile * flotte.planeteDepart.posX + self.tailleTuile / 2
+            y1 = self.tailleTuile * flotte.planeteDepart.posY + self.tailleTuile / 2
 
-            x2 = self.tailleTuile * flotte.planeteArrivee.posX + self.tailleTuile/2
-            y2 = self.tailleTuile * flotte.planeteArrivee.posY + self.tailleTuile/2
+            x2 = self.tailleTuile * flotte.planeteArrivee.posX + self.tailleTuile / 2
+            y2 = self.tailleTuile * flotte.planeteArrivee.posY + self.tailleTuile / 2
             self.canvas.create_line(x1, y1, x2, y2, width=4, fill="#BF0E0E", tag="flotte")
 
 
@@ -120,24 +120,24 @@ class Galaxie(Frame):
         """ affiche les flottes dépendement de leur completion selon le temps """
         for flotte in flottes:
 
-            tailleFlotte = 8 #La taille d,une flotte en pixel
+            tailleFlotte = 8  #La taille d,une flotte en pixel
 
             completion = anneeCourante - flotte.anneeDepart  #La completion sur denominateur
             denominateur = flotte.anneeArrivee - flotte.anneeDepart
             if denominateur == 0:
                 return  #On ne peut diviser par 0
 
-            completionSur1 = completion/denominateur
+            completionSur1 = completion / denominateur
 
-            dx = (flotte.planeteArrivee.posX*self.tailleTuile - flotte.planeteDepart.posX*self.tailleTuile) * completionSur1 + flotte.planeteDepart.posX*self.tailleTuile
-            dy = (flotte.planeteArrivee.posY*self.tailleTuile - flotte.planeteDepart.posY*self.tailleTuile) * completionSur1 + flotte.planeteDepart.posY*self.tailleTuile
+            dx = (
+                     flotte.planeteArrivee.posX * self.tailleTuile - flotte.planeteDepart.posX * self.tailleTuile) * completionSur1 + flotte.planeteDepart.posX * self.tailleTuile
+            dy = (
+                     flotte.planeteArrivee.posY * self.tailleTuile - flotte.planeteDepart.posY * self.tailleTuile) * completionSur1 + flotte.planeteDepart.posY * self.tailleTuile
 
             # TODO mettre une image à la place
-            self.canvas.create_oval(dx+self.tailleTuile/2, dy+self.tailleTuile/2, dx+tailleFlotte, dy+tailleFlotte, fill="green", tag="flotte")
+            self.canvas.create_oval(dx + self.tailleTuile / 2, dy + self.tailleTuile / 2, dx + tailleFlotte,
+                                    dy + tailleFlotte, fill="green", tag="flotte")
             # TODO Afficher le nombre de vaisseaux de la flotte
-
-
-
 
 
     def drawPlanetes(self, listePlanetes, selection1, selection2):
@@ -148,10 +148,10 @@ class Galaxie(Frame):
 
             # SELECTION
             if planete == selection1:
-                self.canvas.create_image(x-8, y-8, anchor=NW, image=self.selectionImage, tag="planete")
+                self.canvas.create_image(x - 8, y - 8, anchor=NW, image=self.selectionImage, tag="planete")
 
             if planete == selection2:
-                self.canvas.create_image(x-8, y-8, anchor=NW, image=self.selectionImage2, tag="planete")
+                self.canvas.create_image(x - 8, y - 8, anchor=NW, image=self.selectionImage2, tag="planete")
             #PLANETE
             if planete.civilisation == Races.HUMAIN:
                 self.canvas.create_image(x, y, anchor=NW, image=self.humainImage, tag="planete")
@@ -165,13 +165,7 @@ class Galaxie(Frame):
             elif planete.civilisation == Races.INDEPENDANT:
                 self.canvas.create_image(x, y, anchor=NW, image=self.indieImage, tag="planete")
 
-
-
-
-
-
-
-
+            #self.canvas.create_text(x+20, y+self.tailleTuile+20, text=planete.nom, fill="white")
 
 
 class Gui(Tk):
@@ -325,7 +319,7 @@ class Gui(Tk):
         #Console Ennemis
         self.consoleEnnemis = Console(self.consolesFrame, 10)
         self.consoleEnnemis.grid(row=0, column=1, sticky=N + W + E + S)
-
+        self.consoleEnnemis.console.configure(foreground="red")
         self.consolesFrame.grid_columnconfigure(0, weight=1)
 
 
@@ -339,9 +333,8 @@ class Gui(Tk):
         self.galaxie.draw(data)
 
         self.infoBox.setValue("Humains:", data["nbPlanetesHumain"])
-        self.infoBox.setValue("Gubru:",  data["nbPlanetesGubru"])
-        self.infoBox.setValue("Czin:",  data["nbPlanetesCzin"])
-
+        self.infoBox.setValue("Gubru:", data["nbPlanetesGubru"])
+        self.infoBox.setValue("Czin:", data["nbPlanetesCzin"])
 
         anneeCourante = int(data["anneeCourante"])
 
@@ -368,10 +361,14 @@ class Gui(Tk):
         pass  # TODO Rafraichir flotte
         if not data["planeteDepart"]:
             data["planeteDepart"] = "-"
-        self.commandBox.setValue("Départ:", data["planeteDepart"]) #TODO mettre le nom
+        else:
+            data["planeteDepart"] = data["planeteDepart"].nom
+        self.commandBox.setValue("Départ:", data["planeteDepart"])
 
         if not data["planeteArrivee"]:
             data["planeteArrivee"] = "-"
+        else:
+            data["planeteArrivee"] = data["planeteArrivee"].nom
         self.commandBox.setValue("Destination:", data["planeteArrivee"])
 
         if not data["distance"]:
@@ -389,26 +386,25 @@ class Gui(Tk):
 
 
     # ACTIVATION/DESACTIVATION WIDGET DU GUI #
-    def activerFinTour(self, bool):
+    def activerFinTour(self, isEnabled):
         """ permet d'activer/desactiver btn fin tour """
-        if bool:
-            bool = 'active'
+        if isEnabled:
+            isEnabled = 'active'
         else:
-            bool = 'disabled'
-        self.btnTerminerTour.configure(state=bool)
+            isEnabled = 'disabled'
+        self.btnTerminerTour.configure(state=isEnabled)
 
-    def activerValiderDeplacement(self, bool):
+    def activerValiderDeplacement(self, isEnabled):
         """ permet d'activer/desactiver btn fin tour """
-        if bool:
-            bool = 'active'
+        if isEnabled:
+            isEnabled = 'active'
         else:
-            bool = 'disabled'
-        self.btnValiderDeplacement.configure(state=bool)
+            isEnabled = 'disabled'
+        self.btnValiderDeplacement.configure(state=isEnabled)
 
-    def activerBarreAugmentation(self, bool):
+    def activerBarreAugmentation(self, isEnabled):
         """ permet d'activer/desactiver la barre  nb vaisseaux flotte """
-        self.nbVaisseauxWidget.activer(bool)
-
+        self.nbVaisseauxWidget.activer(isEnabled)
 
 
     # NOTIFICATION D'ENTRÉE UTILISATEUR
@@ -425,7 +421,6 @@ class Gui(Tk):
         y = int(event.y / self.galaxie.tailleTuile)
         coord = (x, y)
         self.callBack(UserActions.SELECT_PLANETE_2, coord)
-
 
 
     def notifyValiderDeplacement(self):
@@ -454,7 +449,7 @@ class Box(Frame):
         self.foreground = "black"
 
         Frame.__init__(self, parent, width=100, height=100)
-        self.values = {}  #A dictionnary containing the values for each label
+        self.values = {}  # A dictionnary containing the values for each label
         self.currentRow = 0
 
     def insertImage(self, labelStr, imagePath, value=None):
@@ -541,24 +536,26 @@ class Console(Frame):
         self.console.config(state=DISABLED)
 
     def victoirePlanete(self, annee, race, planete):  # TODO planete
-        message = "[Année: %s] Les %s ont obtenu la planète %s" % (annee, race,planete)
+        message = "[Année: %s] Les %s ont obtenu la planète %s" % (annee, race, planete.nom)
         self.insert(message)
 
-    def affrontemenPlanete(self,annee, attanquant, defenseur, planete):
-        message = "[Année: %s] Les %s ont attaqué les %s sur %s" % (annee, attanquant, defenseur, planete)
+    def affrontementPlanete(self, annee, attanquant, defenseur, planete):
+        message = "[Année: %s] Les %s ont attaqué les %s sur %s" % (annee, attanquant, defenseur, planete.nom)
         self.insert(message)
 
     def defensePlanete(self, annee, defenseur, attaquant, planete):
-        message = "[Année: %s] Les %s ont défendu avec succes %s contre les %s" % (annee, defenseur, planete, attaquant)
+        message = "[Année: %s] Les %s ont défendu avec succes %s contre les %s" % (
+            annee, defenseur, planete.nom, attaquant)
         self.insert(message)
 
     def pertePlanete(self, annee, defenseur, attaquant, planete):
-        message = "[Année: %s] Les %s ont perdu %s au main des %s" % (annee, defenseur, planete, attaquant)
+        message = "[Année: %s] Les %s ont perdu %s au main des %s" % (annee, defenseur, planete.nom, attaquant)
         self.insert(message)
 
     def annihilationRace(self, race):
-        message = "[Année: %s] Les %s ont été annihilé"
+        message = "[Année: %s] Les %s ont été annihilé" % race
         self.insert(message)
+
 
 class BarreAugmentation(Frame):
     def __init__(self, parent, max, min=0, step=1):

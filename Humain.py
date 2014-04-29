@@ -8,10 +8,3 @@ class Humain:
         self.puissanceAttaque = 0 # a definir selon une fonction random au dbut du jeu
         self.etoileMere = 0 # coordonnees pour identifier l'etoile-mere du joueur initialisee au hasard depuis le debut
 
-    def getEtoiles(self):
-        """  appel a la methode pour conquerir d'autres planetes  """
-        pass
-
-    def isDead(self):
-        """ methode declarant que le joueur a perdu la partie """
-        pass

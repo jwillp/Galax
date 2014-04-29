@@ -2,11 +2,15 @@
 # -*- coding: utf-8 -*-
 import math
 import random
+import Modele
+from Notification import Affrontement
+from Races import Races
 
 
 class Planete:
-    def __init__(self, x, y, nbManufactures):
-        self.nom = None
+    def __init__(self, x, y, nbManufactures, nom):
+
+        self.nom = nom
         self.civilisation = None  # quelle civilisation occupe cette planete (humain, Czins, Gubru ou non-colonisateurs)
         self.isPlaneteMere = False  # booleen si cette planete est  planete mèr4e des civilisations colonisatrices
         self.posX = x  # coordonnee x d'une planete
@@ -16,10 +20,10 @@ class Planete:
         self.nbVaisseaux = self.nbManufactures  # nombre de vaisseaux que possede la planete
 
 
-    def seDefendre(self, flotte):
-        # TODO Création notification affrontement
+    def seDefendre(self, flotte, listeNotif, anneeCourante):
 
-
+        if flotte.civilisation == Races.HUMAIN:
+            self.nbVisites += 1
 
         effetSurprise = False
         attaquants = flotte.nbVaisseaux
@@ -52,8 +56,13 @@ class Planete:
         if flotte.nbVaisseaux > self.nbVaisseaux:
             self.nbVaisseaux = flotte.nbVaisseaux
             self.civilisation = flotte.civilisation
+            isDefenseReussie = False
+        else:
+            isDefenseReussie = True
 
         #TODO notification de affrontement selon issue du combat
+            notif = Affrontement(anneeCourante, self, flotte.civilisation, self.civilisation, isDefenseReussie)
+            listeNotif.append(notif)
 
 
 

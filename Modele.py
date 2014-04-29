@@ -14,7 +14,10 @@ class Modele:
     def __init__(self, tailleX, tailleY, nombrePlanetes):
         self.tailleX = tailleX
         self.tailleY = tailleY
+
         self.nombrePlanetes = nombrePlanetes
+        self.nomPlanetes = []
+
         self.listePlanetes = []
         self.listeFlottes = []
         self.anneeCourante = 0
@@ -28,10 +31,21 @@ class Modele:
         self.planeteSelectionnee = None
         self.notifications = []
 
+    def chargerNomPlanetes(self):
+        fichier = open('noms_planetes.data', 'r')
+        self.nomPlanetes = fichier.readlines()
+        print(len(self.nomPlanetes))
+        fichier.close()
+
+    def obtenirNom(self):
+        return random.choice(self.nomPlanetes)
 
     def creerPlanetes(self):
+        self.chargerNomPlanetes()
+        print(self.obtenirNom())
+
         for n in range(0, self.nombrePlanetes):
-            self.listePlanetes.append(Planete(None, None, None))
+            self.listePlanetes.append(Planete(None, None, None, self.obtenirNom()))
             self.listePos = [None, None]
 
         for n in range(0, self.nombrePlanetes):
@@ -54,8 +68,7 @@ class Modele:
                 randomPositionY = random.randrange(self.tailleY)
                 position = [randomPositionX, randomPositionY]
 
-        return Planete(randomPositionX, randomPositionY, randomManufactures)  #TODO ajouter import pour les planetes
-
+        return Planete(randomPositionX, randomPositionY, randomManufactures, self.obtenirNom())
 
     def determinerPlaneteMereHumains(self):
         self.planeteMereHumains = random.randrange(len(self.listePlanetes))
@@ -64,7 +77,6 @@ class Modele:
         self.listePlanetes[self.planeteMereHumains].nbManufactures = 10
         self.listePlanetes[self.planeteMereHumains].nbVaisseaux = 100
         self.planeteMereHumains = self.listePlanetes[self.planeteMereHumains]
-
 
     def determinerPlaneteMereGubrus(self):
         #trouve une planete qui n'est pas la planete mere humaine
@@ -101,21 +113,21 @@ class Modele:
         print("nbVaisseaux: %s" % nbVaisseaux)
         self.listeFlottes.append(Flotte(planeteDepart, planeteArrivee, civilisation, nbVaisseaux,
                                         self.anneeCourante +
-                                            self.tempsDeplacement(planeteDepart, planeteArrivee), self.anneeCourante))
-        for planete in self.listePlanetes:
-            if planete == planeteDepart:
-                planete.nbVaisseaux -= nbVaisseaux
+                                        self.tempsDeplacement(planeteDepart, planeteArrivee), self.anneeCourante))
+
+        planeteDepart.nbVaisseaux -= nbVaisseaux
 
     def arriveeFlottes(self):
         #verifie l'arrivee des flottes et gere le retour des flottes Gubrus d'une nouvelle conquete
 
         for flotte in self.listeFlottes:
-            if flotte.anneeArrivee == round(self.anneeCourante, 1):
-                print("ARRIVÉE: " + str(self.anneeCourante))
+            print("%s =?= %s" % (flotte.anneeArrivee, round(self.anneeCourante, 1)))
+            if round(flotte.anneeArrivee, 1) == round(self.anneeCourante, 1):
+
                 planeteAttaquee = flotte.planeteArrivee
 
                 if flotte.civilisation != flotte.planeteArrivee.civilisation:
-                    planeteAttaquee.seDefendre(flotte)
+                    planeteAttaquee.seDefendre(flotte, self.notifications, self.anneeCourante)
                 else:
                     planeteAttaquee.nbVaisseaux += flotte.nbVaisseaux
 
