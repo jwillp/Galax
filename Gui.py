@@ -105,7 +105,6 @@ class Galaxie(Frame):
 
     def drawTrajectoireFlottes(self, flottes):
         """ affiche la trajectoire de toutes les flottes humaines """
-        # TODO voir avec le modèle pourquoi planeteArrivee est vide
 
         for flotte in flottes:
             x1 = self.tailleTuile * flotte.planeteDepart.posX + self.tailleTuile / 2
@@ -134,10 +133,18 @@ class Galaxie(Frame):
             dy = (
                      flotte.planeteArrivee.posY * self.tailleTuile - flotte.planeteDepart.posY * self.tailleTuile) * completionSur1 + flotte.planeteDepart.posY * self.tailleTuile
 
-            # TODO mettre une image à la place
+            color = None
+            if flotte.civilisation == Races.GUBRU:
+                color = "red"
+            elif flotte.civilisation == Races.CZIN:
+                color = "green"
+            elif flotte.civilisation == Races.HUMAIN:
+                color = "blue"
+            else:
+                color = "white"
+
             self.canvas.create_oval(dx + self.tailleTuile / 2, dy + self.tailleTuile / 2, dx + tailleFlotte,
-                                    dy + tailleFlotte, fill="green", tag="flotte")
-            # TODO Afficher le nombre de vaisseaux de la flotte
+                                    dy + tailleFlotte, fill=color, tag="flotte")
 
 
     def drawPlanetes(self, listePlanetes, selection1, selection2):
@@ -343,7 +350,7 @@ class Gui(Tk):
 
     def inspecterPlanete(self, nom, x, y, capacite=None, nbVaisseaux=None):
         """ Permet d'inspecter une planete grace au "panneau planete" (infoBox)"""
-        self.infoBox.setValue("Nom de la planète:", nom)  # TODO inspecter planete
+        self.infoBox.setValue("Nom de la planète:", nom)
 
         if not capacite:
             capacite = "-"
@@ -352,13 +359,12 @@ class Gui(Tk):
         if not nbVaisseaux:
             nbVaisseaux = "-"
             self.nbVaisseauxWidget.configure(from_=0)
-            self.nbVaisseauxWidget.configure(to_= 0)
-        # TODO vérification planète humaine ou non
+            self.nbVaisseauxWidget.configure(to_=0)
+
         self.infoBox.setValue("Nombre de vaisseaux:", nbVaisseaux)
 
     def rafraichirFlotte(self, data):
         """ Raffraichit le panneau Flotte """
-        pass  # TODO Rafraichir flotte
         if not data["planeteDepart"]:
             data["planeteDepart"] = "-"
         else:
@@ -537,7 +543,7 @@ class Console(Frame):
         self.console.insert(END, message + "\n")
         self.console.config(state=DISABLED)
 
-    def victoirePlanete(self, annee, race, planete):  # TODO planete
+    def victoirePlanete(self, annee, race, planete):
         message = "[Année: %s] Les %s ont obtenu la planète %s" % (annee, race, planete.nom)
         self.insert(message)
 
@@ -567,7 +573,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-# TODO TESTS
-# TESTER SI L'AFFICHAGE FONCTIONNE
-# TESTER L'ACTIVATION DÉSACTIVATION DES WIDGETS

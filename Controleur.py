@@ -14,7 +14,7 @@ class Controleur():
 
         nbCol = 25
         nbLignes = 20
-        nbPlanete = 40
+        nbPlanete = 35
 
         self.initModele(nbCol, nbLignes, nbPlanete)
         self.initGui()
@@ -26,21 +26,20 @@ class Controleur():
 
         data = {}
         data["anneeCourante"] = self.modele.anneeCourante
-        data["listePlanetes"] = self.modele.listePlanetes
-        data["nbPlanetesHumain"] = self.modele.listePlanetesRace(Races.HUMAIN)
-        data["nbPlanetesGubru"] = self.modele.listePlanetesRace(Races.GUBRU)
-        data["nbPlanetesCzin"] = self.modele.listePlanetesRace(Races.CZIN)
+        data["listePlanetes"] = self.modele.planetes
+        data["nbPlanetesHumain"] = self.modele.getNbPlanetesRace(Races.HUMAIN)
+        data["nbPlanetesGubru"] = self.modele.getNbPlanetesRace(Races.GUBRU)
+        data["nbPlanetesCzin"] = self.modele.getNbPlanetesRace(Races.CZIN)
         data["selection1"] = None
         data["selection2"] = None
         data["flottesHumaines"] = None
-        data["flottes"] = self.modele.listeFlottes
+        data["flottes"] = self.modele.flottes
 
         self.gui.rafraichir(data)
 
     def initModele(self, nbCols, nbLignes, nbPlanetes):
         self.modele = Modele(nbCols, nbLignes, nbPlanetes)
         self.modele.creerPlanetes()
-        self.modele.planeteSelectionnee2 = None  # TODO effacer cette ligne lorsque le modele sera modifié
 
     def executer(self):
         """ permet de lancer le GUI """
@@ -101,15 +100,15 @@ class Controleur():
 
     def gestionSelection2(self, planete):
         self.modele.planeteSelectionnee2 = planete
+        if self.modele.planeteSelectionnee:
+            if self.modele.planeteSelectionnee.civilisation == Races.HUMAIN:
+                self.gui.nbVaisseauxWidget.configure(to_=self.modele.planeteSelectionnee.nbVaisseaux)
+                activation = True
+            else:
+                activation = False
+                self.gui.resetNombreVaisseaux()
 
-        if self.modele.planeteSelectionnee.civilisation == Races.HUMAIN:
-            self.gui.nbVaisseauxWidget.configure(to_=self.modele.planeteSelectionnee.nbVaisseaux)
-            activation = True
-        else:
-            activation = False
-            self.gui.resetNombreVaisseaux()
-
-        self.gui.activerBarreAugmentation(activation)
+            self.gui.activerBarreAugmentation(activation)
 
 
     def gestionChangementFlotte(self):
@@ -128,7 +127,7 @@ class Controleur():
         arrivee = self.modele.planeteSelectionnee2
         data = {"planeteDepart": depart, "planeteArrivee": arrivee}
         if depart and arrivee:
-            data["distance"] = self.modele.tempsDeplacement(depart, arrivee)
+            data["distance"] = self.modele.calculerDistance(depart, arrivee)
         else:
             data["distance"] = None
         self.gui.rafraichirFlotte(data)
@@ -163,7 +162,7 @@ class Controleur():
         planeteArrive = self.modele.planeteSelectionnee2
         nbVaisseaux = self.gui.getNbVaisseaux()
 
-        self.modele.ajoutFlottes(planeteDepart, planeteArrive, Races.HUMAIN, nbVaisseaux)
+        self.modele.ajouterFlotte(planeteDepart, planeteArrive, Races.HUMAIN, nbVaisseaux)
 
         self.gui.resetNombreVaisseaux()
         self.gui.activerBarreAugmentation(False)
@@ -181,13 +180,13 @@ class Controleur():
     def rafraichirGui(self):
         data = {}
         data["anneeCourante"] = self.modele.anneeCourante
-        data["listePlanetes"] = self.modele.listePlanetes
-        data["nbPlanetesHumain"] = self.modele.listePlanetesRace(Races.HUMAIN)
-        data["nbPlanetesGubru"] = self.modele.listePlanetesRace(Races.GUBRU)
-        data["nbPlanetesCzin"] = self.modele.listePlanetesRace(Races.CZIN)
+        data["listePlanetes"] = self.modele.planetes
+        data["nbPlanetesHumain"] = self.modele.getNbPlanetesRace(Races.HUMAIN)
+        data["nbPlanetesGubru"] = self.modele.getNbPlanetesRace(Races.GUBRU)
+        data["nbPlanetesCzin"] = self.modele.getNbPlanetesRace(Races.CZIN)
         data["selection1"] = self.modele.planeteSelectionnee
         data["selection2"] = self.modele.planeteSelectionnee2
-        data["flottes"] = self.modele.listeFlottes
+        data["flottes"] = self.modele.flottes
         self.gui.rafraichir(data)
 
 

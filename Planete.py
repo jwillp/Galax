@@ -19,11 +19,25 @@ class Planete:
         self.nbVisites = 0  # nombre de fois que l'humain a visite cette planete
         self.nbVaisseaux = self.nbManufactures  # nombre de vaisseaux que possede la planete
 
-    def seDefendre(self, flotte, listeNotif, anneeCourante):
-        notif = Affrontement(anneeCourante, self, flotte.civilisation, self.civilisation, False)
+    def gererFlotte(self, flotte, listeNotif, anneeCourante):
+        """ Gere une flotte arrivant en territoire de la planete """
 
         if flotte.civilisation == Races.HUMAIN:
             self.nbVisites += 1
+
+        if flotte.civilisation == self.civilisation:
+            self.accueillirFlotte(flotte)
+        else:
+            self.seDefendre(flotte, listeNotif, anneeCourante)
+
+
+    def accueillirFlotte(self, flotte):
+        """ Accueille un flotte [amie] au sein de ses rangs """
+        self.nbVaisseaux += flotte.nbVaisseaux
+
+    def seDefendre(self, flotte, listeNotif, anneeCourante):
+        """ Se défend contre une flotte d'envahisseur"""
+        notif = Affrontement(anneeCourante, self, flotte.civilisation, self.civilisation, False)
 
         effetSurprise = False
         attaquants = flotte.nbVaisseaux
@@ -32,28 +46,25 @@ class Planete:
         if defenseurs > 0:
             probSurprise = self.calculEffetSurprise(defenseurs, attaquants)*100
 
-            rnd = random.randrange(0, 100)
+            rnd = random.randrange(0, 1+100)
             if 0 <= rnd < probSurprise:
                 effetSurprise = True
-                attaquants, defenseur = defenseurs, attaquants
-
-                indexAttanquant = attaquants
-                indexDefenseur = defenseurs
-
-                while attaquants != 0 and defenseurs != 0:
-                    rand = random.randrange(0, 10)
-                    if 0 <= rand <= 7:  # Victoire du defenseur
-                        indexAttanquant -= 1
-                    else:  # Victoire de l'attaquant
-                        indexDefenseur -= 1
-
-                if effetSurprise:
-                    attaquants, defenseur = defenseurs, attaquants
-
-                self.nbVaisseaux = defenseurs
-                flotte.nbVaisseaux = attaquants
+                attaquants, defenseurs = defenseurs, attaquants
 
 
+
+            while attaquants > 0 and defenseurs > 0:
+                rand = random.randrange(0, 10)
+                if 0 <= rand <= 7:  # Victoire du defenseur
+                    attaquants -= 1
+                else:  # Victoire de l'attaquant
+                    defenseurs -= 1
+
+            if effetSurprise:  # Rétablir les camps si effet surprise
+                attaquants, defenseurs = defenseurs, attaquants
+
+            self.nbVaisseaux = defenseurs
+            flotte.nbVaisseaux = attaquants
 
         if flotte.nbVaisseaux > self.nbVaisseaux:
             self.nbVaisseaux = flotte.nbVaisseaux
@@ -62,14 +73,12 @@ class Planete:
         else:
             isDefenseReussie = True
 
-        #TODO notification de affrontement selon issue du combat
-
         notif.isDefenseReussie = isDefenseReussie
         listeNotif.append(notif)
 
-
-
-
+    def produireVaisseaux(self):
+        """Produit des vaisseaux selon le nombre de manufactures """
+        self.nbVaisseaux += self.nbManufactures
 
     @staticmethod
     def calculEffetSurprise(nbDefenseurs, nbEnvahisseurs):
@@ -82,4 +91,5 @@ class Planete:
             p = 0.95
 
         return p
+
 

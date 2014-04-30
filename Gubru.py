@@ -1,69 +1,102 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from Races import*
+import operator
+from Flotte import Flotte
+from Modele import Modele
+from Races import *
+
 
 class Gubru:
-    def __init__(self, parent):
-        self.parent = parent
-        self.force_attaque_basique = 10
-        self.nbr_vaisseaux_par_attaque = 5
-        self.planeteMere = None
+    FORCE_ATTAQUE_BASIQUE = 10
+    NBR_VAISSEAUX_PAR_ATTAQUE = 5
+
+    def __init__(self, modele):
+        self.modele = modele
         self.listePlanetesAttaquees = []
-        
-    def forceAttaque(self):
-        if self.parent.anneeCourante * self.nbr_vaisseaux_par_attaque + self.force_attaque_basique > self.force_attaque_basique*2:
-            return self.parent.anneeCourante * self.nbr_vaisseaux_par_attaque + self.force_attaque_basique
-        else : 
-            return self.force_attaque_basique*2
-        
-    def creerFlottes(self):
-        self.flottesAttaque() # cree les flottes qui vont attaquer des planetes
-        
-        planetesGubrus = []
-        for n in range(0, len(self.parent.listePlanetes)):
-            if self.parent.listePlanetes[n].civilisation == Races.GUBRU:
-                planetesGubrus.append(self.parent.listePlanetes[n]) # ajoute a une liste les planetes conquises par les gubrus et en cours d'attaque pour ne pas envoyer plusieurs flottes aux memes planetes
-                
-        # cree les flottes a partir de planetes avec plus de 25 vaisseaux
-        for n in planetesGubrus:
-            if n.nbVaisseaux > 25:
-                self.parent.ajoutFlottes(n, self.planeteMere, Races.GUBRU, n.nbVaisseaux-15)
-                
-    def flottesAttaque(self):
-        #determine les planetes les plus pres non Gubru non attaquees et les ajoute a une liste de planetes attaquees et cree les flottes
-        if self.planeteMere.nbVaisseaux >= self.forceAttaque()+self.force_attaque_basique:
-            while self.planeteMere.nbVaisseaux >= self.forceAttaque():
-                planeteChoisie = self.choisirPlaneteAttaquee()
-                self.listePlanetesAttaquees.append(planeteChoisie)
-                self.parent.ajoutFlottes(self.planeteMere, planeteChoisie, Races.GUBRU, 10) # TODO mettre un vrai nombre de vaisseaux
-                
-    def retourFlottesConquete(self, planeteConquise):
-        #gere le retour des flottes apres une conquete ( appellee dans le modele apres l'arrivee des flottes et le combat)
-        if planeteConquise.nbVaisseaux > 25:
-            self.parent.ajoutFlotte(planeteConquise, self.planeteMere, Races.GUBRU, planeteConquise.nbVaisseaux-15)
+
+    @staticmethod
+    def forceAttaque(anneeCourante):
+        """ Calcul la force d'attaque des GUBRU """
+        force1 = anneeCourante * Gubru.NBR_VAISSEAUX_PAR_ATTAQUE + Gubru.FORCE_ATTAQUE_BASIQUE
+        force2 = Gubru.FORCE_ATTAQUE_BASIQUE * 2
+        if force1 > force2:
+            return force1
         else:
-            self.parent.ajoutFlotte(planeteConquise, self.planeteMere, Races.GUBRU, planeteConquise.nbVaisseaux)
-    
-    def choisirPlaneteAttaquee(self):
-        #trouve la prochaine planete a attaquer en s'assurant qu'il n'y a pas deja une flotte en direction
-        self.parent.updatePlanetesAttaqueesGubru()
-        distance = 2000000000 #chiffre ridicule pour trouver ce qui est plus proche
-        planeteAttaquee = None
-        for n in range(0, len(self.parent.listePlanetes)):
-            if self.parent.tempsDeplacement(self.planeteMere, self.parent.listePlanetes[n]) < distance and self.parent.listePlanetes[n].civilisation != Races.GUBRU: 
-                for i in range(0, len(self.listePlanetesAttaquees)):
-                    if self.parent.listePlanetes[n] != self.listePlanetesAttaquees[i]:
-                        distance = self.parent.tempsDeplacement(self.planeteMere, self.parent.listePlanetes[n])
-                        planeteAttaquee = self.parent.listePlanetes[n]
-        return planeteAttaquee
-    
+            return force2
+
+    def jouer(self):
+        planeteMere = self.modele.getPlaneteMereRace(Races.GUBRU)
+        puissanceAttaque = self.forceAttaque(self.modele.anneeCourante) + Gubru.FORCE_ATTAQUE_BASIQUE
+
+        if not planeteMere:
+            self.choisirNouvellePlaneteMere()
+
+        if planeteMere.nbVaisseaux > puissanceAttaque:
+            self.creerFlottesAssaut(puissanceAttaque)
+
+        self.rapatrierFlottes()
+
+
+
+
+    def creerFlottesAssaut(self, puissanceAttaque):
+        """ Gere la formation des flottes des gubrus """
+
+        for planete in self.getPlanetesProches():
+            if not self.isFlotteTrajectoire(self.getPlaneteMere(), planete):
+                self.modele.ajouterFlotte(self.getPlaneteMere(), planete, Races.GUBRU, puissanceAttaque)
+
+    def rapatrierFlottes(self):
+        """ Rapatrie les flottes selon la logique Gubru """
+        planetes = self.getPlanetes()
+        planetes.remove(self.getPlaneteMere())  # Retirer la planete mere (rapatrier mere vers mere == illogique)
+
+        for planete in planetes:
+            if planete.nbVaisseaux > 25:
+                # A-t-on deja rapatrie une flotte?
+                if not self.isFlotteTrajectoire(planete, self.getPlaneteMere()):
+                    vaisseauxRapatrier = 25 - 15
+                    self.modele.ajouterFlotte(planete, self.getPlaneteMere(), Races.GUBRU, vaisseauxRapatrier)
+
+    def isFlotteTrajectoire(self, planeteDepart, planeteArrivee):
+        """ Retourne true si une flotte à la trajectoire de planeteDepart vers planeteArrivee
+        :type planeteDepart: Planete
+        :type planeteArrivee: Planete
+        """
+        for flotte in self.modele.getFlotteRace(Races.GUBRU):
+            if planeteDepart == flotte.planeteDepart and planeteArrivee == flotte.planeteArrivee:
+                return True
+        return False
+
+
+
     def choisirNouvellePlaneteMere(self):
-        #choisit la nouvelle planete mere
-        if self.planeteMere.civilisation != Races.GUBRU:
-            for n in range(0, len(self.parent.listePlanetes)):
-                if self.parent.listePlanetes[n].civilisation == Races.GUBRU:
-                    self.planeteMere = self.parent.listePlanetes[n]
-                    self.parent.listePlanetes[n].isPlaneteMere = True
-                    self.parent.planeteMereGubru = self.parent.listePlanetes[n]
-            
-    
+        """ Permet de choisir une nouvelle planete mere """
+        planeteMere = self.getPlanetes()[-1]
+        planeteMere.isPlaneteMere = True
+
+    # MÉTHODES DE RÉCUPÉRATION #
+
+    def getPlanetesProches(self):
+        """ Retourne une liste des planetes les plus proches non Gubru """
+        NB_PLANETES = 4  # Le nombre de planete les plus proches
+        planetesNonGubru = self.modele.getPlanetesNonRace(Races.GUBRU)
+        planetesProximite = []
+
+        for planete in self.modele.getPlanetesNonRace(Races.GUBRU):
+            distance = self.modele.calculerDistance(self.getPlaneteMere(), planete)
+            planetesProximite.append((planete, distance))
+
+        planetesProximite = sorted(planetesProximite, key=operator.itemgetter(1))
+
+        planetes = []
+        for tup in planetesProximite:
+            planetes.append(tup[0])
+
+        return planetes[:NB_PLANETES]
+
+    def getPlaneteMere(self):
+        return self.modele.getPlaneteMereRace(Races.GUBRU)
+
+    def getPlanetes(self):
+        return self.modele.getPlanetesRace(Races.GUBRU)
