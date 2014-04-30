@@ -131,21 +131,20 @@ class Modele:
 
                 self.listeFlottes.remove(flotte)
 
-
-
-    def tempsDeplacement(self, planeteDepart, planeteArrivee):
+    @staticmethod
+    def tempsDeplacement(planeteDepart, planeteArrivee):
         if not planeteDepart or not planeteArrivee:
             return 0
-
-        #calcule le temps de deplacement comme si la distance est l'hypothenuse d'un triangle rectangle et arrondit a une decimale
+        #calcule le temps de deplacement comme si la distance est l'hypothenuse d'un triangle rectangle et arrondit a
+        # une decimale
         distanceX = (planeteArrivee.posX - planeteDepart.posX) ** 2
         distanceY = (planeteArrivee.posY - planeteDepart.posY) ** 2
         distanceFinale = math.sqrt(distanceX + distanceY)
         return round(distanceFinale, 1)
 
-
     def updatePlanetesAttaqueesGubru(self):
-        #s'assure que les Gubrus n'envoir pas plusieurs flottes aux memes planetes ( appelee dans choisirPlanetesAttaqueesGubru de la classe Gubru)
+        #s'assure que les Gubrus n'envoir pas plusieurs flottes aux memes planetes
+        # ( appelee dans choisirPlanetesAttaqueesGubru de la classe Gubru)
         listePlanetesPlusAttaquees = []
         for i in range(0, len(self.gubru.listePlanetesAttaquees)):
             trouve = False
@@ -153,26 +152,25 @@ class Modele:
                 if self.gubru.listePlanetesAttaquees[i] == self.listeFlottes[n].planeteArrivee:
                     if self.listeFlottes[n].civilisation == Races.GUBRU:
                         trouve = True
-            if trouve == False:
+            if not trouve:
                 listePlanetesPlusAttaquees.append(self.gubru.listePlanetesAttaquees[i])
 
         for n in range(0, len(listePlanetesPlusAttaquees)):
             self.gubru.listePlanetesAttaquees.remove(listePlanetesPlusAttaquees[n])
 
         #listePlanetesPlusAttaquees.clear()
-        listePlanetesPlusAttaquees[:] = []  #Clear
-
+        listePlanetesPlusAttaquees[:] = []  # Clear
 
     def avancerTemps(self):
         #fait les taches d'une annee complete sans inclure les actions humaines
-        #self.gubru.creerFlottes()
+        self.gubru.creerFlottes()
         #self.czin.creerFlottes() #TODO : pas mal tout des Czin
         for n in range(10):
             self.arriveeFlottes()
             self.anneeCourante += 0.1
 
-        for n in range(0, len(self.listePlanetes)):
-            self.listePlanetes[n].nbVaisseaux += self.listePlanetes[n].nbManufactures
+        for planete in self.listePlanetes:
+            planete.nbVaisseaux += planete.nbManufactures
 
     def isHumainVivant(self):
         resteFlottes = False
@@ -206,9 +204,3 @@ class Modele:
                 nombre += 1
 
         return nombre
-
-    def selectionnerPlanete(self, planete):
-        self.planeteSelectionnee = planete
-    
-    
-        
