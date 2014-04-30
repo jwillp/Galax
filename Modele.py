@@ -11,24 +11,29 @@ from Races import *
 
 
 class Modele:
+    """ Gestionnaire des données du programme """
+
     def __init__(self, tailleX, tailleY, nombrePlanetes):
+        # Taille de la logique en terme de positions
         self.tailleX = tailleX
         self.tailleY = tailleY
 
-        self.nombrePlanetes = nombrePlanetes
-        self.nomPlanetes = []
-
-        self.listePlanetes = []
-        self.listeFlottes = []
         self.anneeCourante = 0
-        self.listeFlottesSuprimmees = []
-        self.listePos = []
-        self.planeteMereHumains = None
-        self.planeteMereGubrus = None
-        self.planeteMereCzins = None
+
+
+        # Données planètes
+        self.nombreInitialPlanetes = nombrePlanetes  # NombreInitial de planète
+        self.nomPlanetes = []  # Une liste contenant tous les noms attribuables aux planètes
+        self.planetes = []  # Une liste contenant toutes les planetes
+        self.planeteSelectionnee = None
+        self.planeteSelectionnee2 = None
+
+        self.flottes = []  # Une liste contenant toutes les flottes
+
+        # Civilisation
         self.gubru = Gubru(self)
         self.czin = Czin(self)
-        self.planeteSelectionnee = None
+
         self.notifications = []
 
     def chargerNomPlanetes(self):
@@ -39,100 +44,70 @@ class Modele:
     def obtenirNom(self):
         return random.choice(self.nomPlanetes)
 
+    # INITIALISATION DES PLANETES
+
     def creerPlanetes(self):
+        """Initialise toutes les planetes """
         self.chargerNomPlanetes()
-        for n in range(0, self.nombrePlanetes):
-            self.listePlanetes.append(Planete(None, None, None, self.obtenirNom()))
-            self.listePos = [None, None]
 
-        for n in range(0, self.nombrePlanetes):
-            self.listePlanetes[n] = self.positionsPlanetesRandom()
+        positionsPossibles = []
+        for y in range(0, self.tailleY):
+            for x in range(0, self.tailleX):
+                positionsPossibles.append((x, y))  # Ajout d'un tuple
 
-        self.determinerPlanetesIndependantes()
-        self.determinerPlaneteMereHumains()
-        self.determinerPlaneteMereGubrus()
-        self.determinerPlaneteMereCzins()
+        for n in range(0, self.nombreInitialPlanetes):
+            # On choisit une position au hasard et on l'enlève des positions possibles
+            pos = random.choice(positionsPossibles)
+            positionsPossibles.remove(pos)
 
-    def positionsPlanetesRandom(self):
-        randomPositionX = random.randrange(self.tailleX)
-        randomPositionY = random.randrange(self.tailleY)
-        randomManufactures = random.randrange(7)
-        position = [randomPositionX, randomPositionY]
+            x = pos[0]
+            y = pos[1]
+            nbManufactures = random.randrange(0, 7)  # entre 0 et 6
+            nom = self.obtenirNom()
 
-        for n in range(0, len(self.listePos)):
-            while self.listePos[n] in position:
-                randomPositionX = random.randrange(self.tailleX)
-                randomPositionY = random.randrange(self.tailleY)
-                position = [randomPositionX, randomPositionY]
+            self.planetes.append(Planete(x, y, nbManufactures, nom))
 
-        return Planete(randomPositionX, randomPositionY, randomManufactures, self.obtenirNom())
+        self.determinerPlaneteMere(Races.HUMAIN)
+        self.determinerPlaneteMere(Races.GUBRU)
+        self.determinerPlaneteMere(Races.CZIN)
+        self.initialiserPlanetesIndependantes()
 
-    def determinerPlaneteMereHumains(self):
-        self.planeteMereHumains = random.randrange(len(self.listePlanetes))
-        self.listePlanetes[self.planeteMereHumains].isPlaneteMere = True
-        self.listePlanetes[self.planeteMereHumains].civilisation = Races.HUMAIN
-        self.listePlanetes[self.planeteMereHumains].nbManufactures = 10
-        self.listePlanetes[self.planeteMereHumains].nbVaisseaux = 100
-        self.planeteMereHumains = self.listePlanetes[self.planeteMereHumains]
-
-    def determinerPlaneteMereGubrus(self):
-        #trouve une planete qui n'est pas la planete mere humaine
-        self.planeteMereGubrus = random.randrange(len(self.listePlanetes))
-
-        if self.planeteMereGubrus == self.planeteMereHumains:
-            self.determinerPlaneteMereGubrus()
+    def determinerPlaneteMere(self, race):
+        """Attribu une planete mere aleatoirement a une race"""
+        planete = random.choice(self.planetes)
+        if planete.civilisation:
+            self.determinerPlaneteMere(race)
         else:
-            self.listePlanetes[self.planeteMereGubrus].isPlaneteMere = True
-            self.listePlanetes[self.planeteMereGubrus].civilisation = Races.GUBRU
-            self.listePlanetes[self.planeteMereGubrus].nbManufactures = 10
-            self.listePlanetes[self.planeteMereGubrus].nbVaisseaux = 100
-            self.gubru.planeteMere = self.listePlanetes[self.planeteMereGubrus]
+            planete.isPlaneteMere = True
+            planete.civilisation = race
+            planete.nbManufactures = 10
+            planete.nbVaisseaux = 100
 
-    def determinerPlaneteMereCzins(self):
-        #trouve une planete qui n'est pas la planete mere humaine ou Gubru
-        self.planeteMereCzins = random.randrange(len(self.listePlanetes))
-        if self.planeteMereCzins == self.planeteMereHumains or self.planeteMereCzins == self.planeteMereGubrus:
-            self.determinerPlaneteMereCzins()
-        else:
-            self.listePlanetes[self.planeteMereCzins].isPlaneteMere = True
-            self.listePlanetes[self.planeteMereCzins].civilisation = Races.CZIN
-            self.listePlanetes[self.planeteMereCzins].nbManufactures = 10
-            self.listePlanetes[self.planeteMereCzins].nbVaisseaux = 100
-            self.czin.planeteMere = self.listePlanetes[self.planeteMereCzins]
+    def initialiserPlanetesIndependantes(self):
+        """Initialise les planetes independantes"""
+        for planete in self.planetes:
+            if not planete.civilisation:
+                planete.civilisation = Races.INDEPENDANT
 
-    def determinerPlanetesIndependantes(self):
-        for n in range(0, len(self.listePlanetes)):
-            self.listePlanetes[n].civilisation = Races.INDEPENDANT
-
-    def ajoutFlottes(self, planeteDepart, planeteArrivee, civilisation, nbVaisseaux):
-        #prends pour aquis que le constructeur de Flotte est : Flotte(planeteDepart,
-        # planeteArrivee, civilisation, nbVaisseaux)
-        self.listeFlottes.append(Flotte(planeteDepart, planeteArrivee, civilisation, nbVaisseaux,
-                                        self.anneeCourante +
-                                        self.tempsDeplacement(planeteDepart, planeteArrivee), self.anneeCourante))
-
+    def ajouterFlotte(self, planeteDepart, planeteArrivee, civilisation, nbVaisseaux):
+        """Permet d'ajouter une flotte au modele """
+        self.flottes.append(Flotte(planeteDepart, planeteArrivee, civilisation, nbVaisseaux, self.anneeCourante,
+                                   self.anneeCourante + self.calculerDistance(planeteDepart, planeteArrivee)))
         planeteDepart.nbVaisseaux -= nbVaisseaux
 
     def arriveeFlottes(self):
-        #verifie l'arrivee des flottes et gere le retour des flottes Gubrus d'une nouvelle conquete
+        """ Verifie l'arrivee des flottes et les supprimes le cas échéant """
 
-        for flotte in self.listeFlottes:
+        for flotte in self.flottes:
             if round(flotte.anneeArrivee, 1) == round(self.anneeCourante, 1):
 
-                planeteAttaquee = flotte.planeteArrivee
+                flotte.planeteArrivee.gererFlotte(flotte, self.notifications, self.anneeCourante)
+                self.flottes.remove(flotte)
 
-                if flotte.civilisation != flotte.planeteArrivee.civilisation:
-                    planeteAttaquee.seDefendre(flotte, self.notifications, self.anneeCourante)
-                else:
-                    planeteAttaquee.nbVaisseaux += flotte.nbVaisseaux
-
-                if flotte.civilisation == Races.GUBRU and planeteAttaquee.civilisation == Races.GUBRU:
-                    self.gubru.retourFlottesConquete(planeteAttaquee)
-
-                self.listeFlottes.remove(flotte)
 
     @staticmethod
-    def tempsDeplacement(planeteDepart, planeteArrivee):
+    def calculerDistance(planeteDepart, planeteArrivee):
+        """ Calcul le temps de déplacement nécessaire entre deux planètes """
         if not planeteDepart or not planeteArrivee:
             return 0
         #calcule le temps de deplacement comme si la distance est l'hypothenuse d'un triangle rectangle et arrondit a
@@ -142,65 +117,79 @@ class Modele:
         distanceFinale = math.sqrt(distanceX + distanceY)
         return round(distanceFinale, 1)
 
-    def updatePlanetesAttaqueesGubru(self):
-        #s'assure que les Gubrus n'envoir pas plusieurs flottes aux memes planetes
-        # ( appelee dans choisirPlanetesAttaqueesGubru de la classe Gubru)
-        listePlanetesPlusAttaquees = []
-        for i in range(0, len(self.gubru.listePlanetesAttaquees)):
-            trouve = False
-            for n in range(0, len(self.listeFlottes)):
-                if self.gubru.listePlanetesAttaquees[i] == self.listeFlottes[n].planeteArrivee:
-                    if self.listeFlottes[n].civilisation == Races.GUBRU:
-                        trouve = True
-            if not trouve:
-                listePlanetesPlusAttaquees.append(self.gubru.listePlanetesAttaquees[i])
-
-        for n in range(0, len(listePlanetesPlusAttaquees)):
-            self.gubru.listePlanetesAttaquees.remove(listePlanetesPlusAttaquees[n])
-
-        #listePlanetesPlusAttaquees.clear()
-        listePlanetesPlusAttaquees[:] = []  # Clear
-
     def avancerTemps(self):
         #fait les taches d'une annee complete sans inclure les actions humaines
-        self.gubru.creerFlottes()
-        #self.czin.creerFlottes() #TODO : pas mal tout des Czin
+        if self.isRaceVivante(Races.GUBRU):
+            self.gubru.jouer()
+
+        if self.isRaceVivante(Races.CZIN):
+            pass
+            #self.czin.creerFlottes()
+
         for n in range(10):
             self.arriveeFlottes()
             self.anneeCourante += 0.1
 
-        for planete in self.listePlanetes:
-            planete.nbVaisseaux += planete.nbManufactures
+        for planete in self.planetes:
+            planete.produireVaisseaux()
 
-    def isHumainVivant(self):
-        resteFlottes = False
-        restePlanetes = False
-
-        for planete in self.listePlanetes:
-            if planete.civilisation == Races.HUMAIN:
-                restePlanetes = True
-
-        for flotte in self.listeFlottes:
-            if flotte.civilisation == Races.HUMAIN:
-                resteFlottes = True
-
-        if resteFlottes or restePlanetes:
-            return True
-        else:
-            return False
-
+    # Méthode de Récupération
     def getPlaneteAt(self, posX, posY):
+        """ Retourne une planete a une coordonnée donnée """
         planeteRetour = None
-        for planete in self.listePlanetes:
+        for planete in self.planetes:
             if planete.posX == posX and planete.posY == posY:
                 planeteRetour = planete
 
         return planeteRetour
 
-    def listePlanetesRace(self, race):
+    def getNbPlanetesRace(self, race):
+        """ Retourne une liste contenant toutes les planetes d'une race """
         nombre = 0
-        for planete in self.listePlanetes:
+        for planete in self.planetes:
             if planete.civilisation == race:
                 nombre += 1
-
         return nombre
+
+    def getPlanetesRace(self, race):
+        """ Retourne une liste des planete pour une race """
+        planetesRace = []
+        for planete in self.planetes:
+            if planete.civilisation == race:
+                planetesRace.append(planete)
+        return planetesRace
+
+    def getPlanetesNonRace(self, race):
+        """ Retourne une liste des planetes qui n'appartiennent pas à une race """
+        planetesRace = []
+        for planete in self.planetes:
+            if planete.civilisation != race:
+                planetesRace.append(planete)
+        return planetesRace
+
+    def getPlaneteMereRace(self, race):
+        """ Retourne la planete mere d'une race """
+        for planete in self.planetes:
+            if planete.civilisation == race and planete.isPlaneteMere:
+                    return planete
+        return None
+
+    def getFlotteRace(self, race):
+        """ Retourne les flottes d'une race """
+        flotteRace = []
+        for flotte in self.flottes:
+            if flotte.civilisation == race:
+                flotteRace.append(flotte)
+        return flotteRace
+
+    def isRaceVivante(self, race):
+        """Renvoie true si une race possède encore une planete ou une flotte """
+        for planete in self.planetes:
+            if planete.civilisation == race:
+                return True  # Il reste des planetes
+
+        for flotte in self.flottes:
+            if flotte.civilisation == race:
+                return True  # Il reste des flottes
+
+        return False  # Il ne reste plus rien
