@@ -1,116 +1,170 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from ModeCzin import *
+
 from Races import *
 
-class Czin:
-    def __init__(self, parent):
-        self.parent = parent
-        self.nbr_vaisseaux_par_attaque = 4
-        self.force_attaque_basique = 20
-        self.mode = Mode.RASSEMBLEMENT_FORCES
-        self.valeur_grappe = []
-        self.distance_grappe = 4
-        self.valeur_base = []
-        self.base = None
-        self.planeteMere = None
-        self.baseOrigine = None
-        self.grappeEnCours = []
-        self.tempsConquete = None
-        
-    def initialiserValeurGrappe(self):
-        #initialise les valeurs grappe a 0 puis les calcule
-        for n in range(0, len(self.parent.listePlanetes)):
-            self.valeur_grappe.append(0)
+from Enum import *
 
-        for n in range(0, len(self.parent.listePlanetes)):
-            for i in range(0, len(self.parent.listePlanetes)):
-                if self.parent.calculerDistance(self.parent.listePlanetes[n], self.parent.listePlanetes[i]) <= self.distance_grappe:
-                    self.valeur_grappe[n] += (self.distance_grappe - self.parent.calculerDistance(self.parent.listePlanetes[n], self.parent.listePlanetes[i]) + 1)**2
+import operator
+
+class Mode:
+    RASSEMBLEMENT_FORCES = Enum.addId()
+    ETABLIR_BASE = Enum.addId()
+    CONQUERIR_GRAPPE = Enum.addId()
+
+
+
+
+
+class Czin:
+    DISTANCE_GRAPPE = 10
+    NB_VAISSEAUX_PAR_ATTAQUE = 4
+    FORCE_ATTAQUE_BASIQUE = 20
+
+    def __init__(self, modele):
+
+        self.modele = modele
+        self.mode = Mode.ETABLIR_BASE
+        self.grappe = []
+        self.base = self.getPlaneteMere()
+
+    def jouer(self):
+
+        if not self.getPlaneteMere():
+            self.determinerNouvellePlaneteMere()
+
+        self.gererModes()
+
+
+
+
+
+    def forceAttaque(self):
+        """ Calcul la force d'attaque des Czins """
+        return self.modele.anneeCourante * Czin.NB_VAISSEAUX_PAR_ATTAQUE * Czin.FORCE_ATTAQUE_BASIQUE
+
+
+    # GESTION DES MODES #
+
+    def gererModes(self):
+        if self.mode == Mode.RASSEMBLEMENT_FORCES:
+            self.gererModeRassemblement()
+
+        elif self.mode == Mode.ETABLIR_BASE:
+            self.gererModeEtablirBase()
+
+        elif self.mode == Mode.CONQUERIR_GRAPPE:
+            self.gererModeConquerirGrappe()
+
+
+
+    def gererModeRassemblement(self):
+        """ Gestion du mode Rassemblement de force """
+        # S'il reste uniquement la base Centrale
+        if self.base:
+            if self.grappe.baseCentrale.nbVaisseaux >= 6:
+
+                if not self.isFlotteTrajectoire(self.grappe.baseCentrale, self.getPlaneteMere()):
+                    self.modele.ajouterFlotte(self.grappe.baseCentrale, self.getPlaneteMere(), Races.CZIN,
+                                              self.grappe.baseCentrale.nbVaisseaux - 3)
+
+            elif self.grappe.baseCentrale.nbVaisseaux >= 3 * self.forceAttaque():
+                self.mode = Mode.ETABLIR_BASE
+
+
+    def gererModeEtablirBase(self):
+        if not self.grappe:
+            self.determinerGrappe()
+            self.determinerBaseGrappe()
+
+        elif self.grappe.baseCentrale:
+            self.mode = Mode.CONQUERIR_GRAPPE
+
+
+    def gererModeConquerirGrappe(self):
+        for planete in self.modele.getPlanetesNonRace(Races.CZIN):
+            if planete.civilisation != Races.CZIN and self.modele.calculerDistance(planete, self.grappe.baseCentrale) <= Czin.DISTANCE_GRAPPE:
+                if not self.isFlotteTrajectoire(self.grappe.baseCentrale, planete):
+                    self.modele.ajouterFlotte(self.grappe.baseCentrale, planete, Races.CZIN, self.forceAttaque())
+
+        self.mode = Mode.RASSEMBLEMENT_FORCES
+
+
 
 
     def determinerGrappe(self):
-        #determine les valeur bases
-        for n in range(0, len(self.parent.listePlanetes)):
-            if self.valeur_grappe[n] == 0:
-                self.valeur_base.append(0)
+        """ Détermine une grappe """
+
+        for planete in self.modele.planetes:
+            planete.valeurGrappe = 0
+
+        for i in self.modele.getPlanetesNonRace(Races.CZIN):
+            for j in self.modele.getPlanetesNonRace(Races.CZIN):
+                if i != j:
+                    distance = self.modele.calculerDistance(i, j)
+                    if distance <= Czin.DISTANCE_GRAPPE:
+                        s = Czin.DISTANCE_GRAPPE - distance + 1
+                        j.valeurGrappe += s * s
+
+
+    def determinerBaseGrappe(self):
+        max = 0
+        base = None
+        for planete in self.modele.planetes:
+            if planete.valeurGrappe == 0:
+                planete.valeurBase = 0
             else:
-                self.valeur_base.append(self.valeur_grappe[n]-3*self.parent.calculerDistance(self.base, self.parent.listePlanetes[n]))
+                planete.valeurBase = planete.valeurGrappe - 3 * self.modele.calculerDistance(planete,
+                                                                                             self.base)
+            if planete.valeurBase >= max:
+                base = planete
 
-    def determinerBase(self):
-        if self.baseOrigine == None:
-            self.baseOrigine = self.planeteMere
+        self.base = base
+
+
+
+
+
+    def determinerNouvellePlaneteMere(self):
+        """ Permet de déterminer une planete mère """
+        if self.base:
+            self.base.isMere = True
         else:
-            self.baseOrigine = self.base
-        valeurMax = 0
-        self.grappeEnCours.clear()
-        indexPlanete = None
-        for n in range(0,len(self.valeur_base)):
-            if valeurMax < self.valeur_base[n] and self.parent.listePlanetes[indexPlanete].civilisation != Races.Czin:
-                valeurMax = self.valeur_base[n]
-                indexPlanete = n
+            self.getPlanetes()[-1].isMere = True
 
-        self.base = self.parent.listePlanetes[indexPlanete]
 
-    #TODO : comprendre comment mettre le tout ensemble
+    # MÉTHODES DE RÉCUPÉRATION #
 
-    def forceAttaque(self):
-        return self.parent.tempsCourant * self.nbr_vaisseaux_par_attaque * self.force_attaque_basique
+    def getPlaneteMere(self):
+        return self.modele.getPlaneteMereRace(Races.CZIN)
 
-    def choixProchainePlaneteGrappe(self):
-        max = 200000000000
-        planeteChoisie = None
-        for planete in self.parent.listePlanetes:
-            flotteEnCours = False
-            for flotte in self.parent.listeFlottes:
-                if flotte.planeteArrivee == planete:
-                    flotteEnCours = True
-            if self.parent.calculerDistance(self.base, planete) <=max and not flotteEnCours:
-                max = self.parent.calculerDistance(self.base, planete)
-                planeteChoisie = planete
+    def getPlanetes(self):
+        return self.modele.getPlanetesRace(Races.CZIN)
 
-        return planeteChoisie
+    def getPlanetesProches(self, planeteCible):
+        """ Retourne une liste des planetes les plus proches non Gubru """
+        planetes = []
+
+        for planete in self.modele.getPlanetesNonRace(Races.CZIN):
+            distance = self.modele.calculerDistance(planeteCible, planete)
+            planetes.append((planete, distance))
+
+        planetes = sorted(planetes, key=operator.itemgetter(1))
+
+        planetesProximite = []
+        for tup in planetes:
+            planetesProximite.append(tup[0])
+
+        return planetesProximite
 
 
 
-    def choixMode(self):
-        if self.mode == Mode.RASSEMBLEMENT_FORCES:
-            self.modeRassemblementForces()
-
-        if self.mode == Mode.ETABLIR_BASE:
-            self.modeEtablirBase()
-
-        if self.mode == Mode.CONQUERIR_GRAPPE:
-            self.modeConquerirGrappe()
-
-
-    def modeEtablirBasee(self):
-        if self.base.civilisation == Races.Czin:
-            self.mode = Mode.CONQUERIR_GRAPPE
-            for planete in self.parent.listePlanetes:
-                if self.parent.calculerDistance(self.base, planete)<=self.distance_grappe:
-                    self.grappeEnCours.append(planete)
-
-            while self.baseOrigine.nbVaisseaux >= self.forceAttaque():
-                self.parent.ajoutFlotte(self.base, self.choixProchainePlaneteGrappe, Races.Czin, self.parent.calculerDistance(self.base, self.choixProchainePlaneteGrappe))
-            self.tempsConquete = self.parent.tempsCourant
-            for n in range(0, len(self.grappeEnCours)):
-                if self.parent.calculerDistance(self.base, self.choixProchainePlaneteGrappe) > self.tempsConquete:
-                    self.tempsConquete += self.parent.calculerDistance(self.base, self.choixProchainePlaneteGrappe)
-
-        else:
-            self.mode = Mode.RASSEMBLEMENT_FORCES
-
-    def modeRassemblementForces(self):
-        if self.base.nbVaisseaux == 3*self.forceAttaque():
-            self.parent.ajoutFlotte(self.baseOrigine, self.base, Races.Czin, 3*self.forceAttaque(), self.parent.calculerDistance(self.base, self.baseOrigine))
-            self.mode = Mode.ETABLIR_BASE
-
-    def modeConquerirGrappe(self):
-        resteFlottes = False
-        for flotte in self.parent.listeFlottes:
-            if flotte.civilisation == Races.CZIN:
-                resteFlottes = True
-
-        if resteFlottes:
-            self.mode = Mode.RASSEMBLEMENT_FORCES
+    def isFlotteTrajectoire(self, planeteDepart, planeteArrivee):
+        """ Retourne true si une flotte à la trajectoire de planeteDepart vers planeteArrivee
+        :type planeteDepart: Planete
+        :type planeteArrivee: Planete
+        """
+        for flotte in self.modele.getFlotteRace(Races.CZIN):
+            if planeteDepart == flotte.planeteDepart and planeteArrivee == flotte.planeteArrivee:
+                return True
+        return False
