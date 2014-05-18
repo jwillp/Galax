@@ -149,8 +149,8 @@ class Controleur():
         if planete.nbVisites == 2:
             self.gui.inspecterPlanete(planete.nom, planete.posX, planete.posY, planete.nbManufactures)
 
-        if planete.nbVisites == 3:
-            self.gui.inspecterPlanete(planete.nom, planete.posX, planete.posY, planete.nbManufactures)
+        if planete.nbVisites >= 3:
+            self.gui.inspecterPlanete(planete.nom, planete.posX, planete.posY, planete.nbManufactures, planete.nbVaisseaux)
 
 
     def validationDeplacement(self):

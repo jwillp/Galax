@@ -69,6 +69,7 @@ class Planete:
         if flotte.nbVaisseaux > self.nbVaisseaux:
             self.nbVaisseaux = flotte.nbVaisseaux
             self.civilisation = flotte.civilisation
+            self.isPlaneteMere = False
             isDefenseReussie = False
         else:
             isDefenseReussie = True

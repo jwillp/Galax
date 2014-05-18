@@ -42,6 +42,7 @@ class Galaxie(Frame):
         # Images
         self.arrierePlan = ImageTk.PhotoImage(Image.open("img/fond.jpg"))
 
+        self.motherImage = ImageTk.PhotoImage(Image.open("img/mother.png"))
         self.gubruImage = ImageTk.PhotoImage(Image.open("img/fire.png"))
         self.czinImage = ImageTk.PhotoImage(Image.open("img/green.png"))
         self.humainImage = ImageTk.PhotoImage(Image.open("img/blue.png"))
@@ -171,6 +172,9 @@ class Galaxie(Frame):
 
             elif planete.civilisation == Races.INDEPENDANT:
                 self.canvas.create_image(x, y, anchor=NW, image=self.indieImage, tag="planete")
+
+            if planete.isPlaneteMere:
+                self.canvas.create_image(x+7, y+7, anchor=NW, image=self.motherImage)
 
             #self.canvas.create_text(x+20, y+self.tailleTuile+20, text=planete.nom, fill="white")
 
